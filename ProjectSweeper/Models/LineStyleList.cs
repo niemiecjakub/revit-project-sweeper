@@ -1,4 +1,5 @@
-﻿using ProjectSweeper.Services.LineStyleProvider;
+﻿using ProjectSweeper.Services.ElementRemover;
+using ProjectSweeper.Services.LineStyleProvider;
 using ProjectSweeper.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,11 @@ namespace ProjectSweeper.Models
     public class LineStyleList : ViewModelBase
     {
         private readonly ILineStyleProvider _lineStyleProvider;
-        public LineStyleList(ILineStyleProvider lineStyleProvider)
+        private readonly IRemoveElement _elementRemover;
+        public LineStyleList(ILineStyleProvider lineStyleProvider, IRemoveElement elementRemover)
         {
             _lineStyleProvider = lineStyleProvider;
+            _elementRemover = elementRemover;
         }
 
         public IEnumerable<LineStyle> GetAllLineStyles()
@@ -22,9 +25,10 @@ namespace ProjectSweeper.Models
             return _lineStyleProvider.GetAllElements();
         }
 
-        public void DeleteLineStyle(LineStyle lineStyle)
+        public async Task DeleteLineStyle(LineStyle lineStyle)
         {
-            Debug.WriteLine("Deleting line style");
+            Debug.WriteLine($"LINE STYLE LIST: {lineStyle.Name}");
+            await _elementRemover.Remove(lineStyle.Id);
         }
     }
 }

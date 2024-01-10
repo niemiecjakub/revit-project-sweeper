@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,9 +19,10 @@ namespace ProjectSweeper.Models
         {
             return _lineStyleList.GetAllLineStyles();
         }
-        public void LineStyleDeleted(LineStyle lineStyle)
+        public async Task LineStyleDeleted(LineStyle lineStyle)
         {
-            _lineStyleList.DeleteLineStyle(lineStyle);
+            Debug.WriteLine("CLEANER: Inside cleaner");
+            await _lineStyleList.DeleteLineStyle(lineStyle);
         }
 
     }

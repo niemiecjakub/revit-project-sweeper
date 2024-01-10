@@ -1,4 +1,5 @@
-﻿using ProjectSweeper.Models;
+﻿using Autodesk.Revit.DB;
+using ProjectSweeper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace ProjectSweeper.Services.ElementRemover
 {
     public interface IRemoveElement
     {
-        void Remove(IEnumerable<IElement> elementsToBeRemoved);
+        Task Remove(ElementId eId);
     }
 }

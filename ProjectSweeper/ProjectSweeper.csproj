@@ -100,6 +100,7 @@
     <Compile Include="ViewModels\LayoutViewModel.cs" />
     <Compile Include="ViewModels\LinePatternViewModel.cs" />
     <Compile Include="ViewModels\LineStyleManagerViewModel.cs" />
+    <Compile Include="ViewModels\LineStyleRemoverViewModel.cs" />
     <Compile Include="ViewModels\LineStyleViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\NavigationBarViewModel.cs" />

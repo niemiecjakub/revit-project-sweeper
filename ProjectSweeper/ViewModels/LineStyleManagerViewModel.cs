@@ -43,23 +43,38 @@ namespace ProjectSweeper.ViewModels
             _cleanerStore = cleanerStore;
             LoadLineStylesCommand = new LoadLineStylesCommand(this, cleanerStore);
 
-            IEnumerable<IElement> elements = (IEnumerable<IElement>)_lineStyles.Where(ls => !ls.IsUsed).ToList();
-            RemoveElementCommand = new RemoveElementsCommand(cleanerStore, elements);
+            IEnumerable<LineStyleViewModel> lineStyleViewModelsToBeDeleted = _lineStyles.Where(ls => !ls.IsUsed);
+            RemoveElementCommand = new RemoveElementsCommand(cleanerStore, lineStyleViewModelsToBeDeleted);
 
 
-            _cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
+            //_cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
         }
         public override void Dispose()
         {
-            _cleanerStore.LineStyleDeleted -= OnLineStyleDeleted;
+            //_cleanerStore.LineStyleDeleted -= OnLineStyleDeleted;
             base.Dispose();
         }
 
-        private void OnLineStyleDeleted(LineStyle style)
-        {
-            LineStyleViewModel lineStyleViewModel = _lineStyles.First(ls => ls.Id == style.Id);
-            _lineStyles.Remove(lineStyleViewModel);
-        }
+        //private void OnLineStyleDeleted(LineStyle style)
+        //{
+        //    LineStyleViewModel lineStyleViewModel = _lineStyles.First(ls => ls.Id == style.Id);
+        //    Debug.WriteLine($"MANAGER: ON {style.Name} DELETED");
+        //    _lineStyles.Remove(lineStyleViewModel);
+        //    //if (_lineStyles.Contains(lineStyleViewModel))
+        //    //{
+        //    //    Debug.WriteLine("CONTAINS");
+        //    //    try
+        //    //    {
+        //    //        _lineStyles.Remove(lineStyleViewModel);
+        //    //        Debug.WriteLine("DELETED");
+
+        //    //    }
+        //    //    catch (Exception ex)
+        //    //    {
+        //    //        Debug.WriteLine(ex.ToString());
+        //    //    }
+        //    //}
+        //}
 
         public static LineStyleManagerViewModel LoadViewModel(CleanerStore cleanerStore)
         {

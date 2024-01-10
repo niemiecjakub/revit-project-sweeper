@@ -45,9 +45,11 @@ namespace ProjectSweeper.Stores
             }
         }
 
-        private void DeleteLineStyle(LineStyle lineStyle)
+        public async Task DeleteLineStyle(LineStyle lineStyle)
         {
+            await _cleaner.LineStyleDeleted(lineStyle);
             _lineStyles.Remove(lineStyle);
+            Debug.WriteLine($"STORE: REMOVED {lineStyle.Name}");
 
             OnLineStyleDeleted(lineStyle);
         }

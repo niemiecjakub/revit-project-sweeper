@@ -21,7 +21,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (Category lineStyle in subcats)
             {
                 LineStyle style = new LineStyle(lineStyle);
-                style.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, style); ;
+                style.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, style.Id); ;
                 lineStyles.Add(style);
             }
 

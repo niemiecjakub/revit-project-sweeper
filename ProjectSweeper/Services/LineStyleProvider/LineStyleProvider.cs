@@ -29,7 +29,7 @@ namespace ProjectSweeper.Services.LineStyleProvider
                 string name = lineStyle.Name;
                 bool canBeRemoved = lineStyle.CanBeRemoved;
 
-                Debug.WriteLine($"{name} -- can be removed? == {canBeRemoved}");
+                //Debug.WriteLine($"{name} -- can be removed? == {canBeRemoved}");
             }
 
             return lineStyles;

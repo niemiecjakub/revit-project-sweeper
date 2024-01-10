@@ -79,6 +79,7 @@
     <Compile Include="Components\NavigationBar.xaml.cs">
       <DependentUpon>NavigationBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\IsUsedToColorConverter.cs" />
     <Compile Include="Models\Cleaner.cs" />
     <Compile Include="Models\LineStyle.cs" />
     <Compile Include="Models\LineStyleList.cs" />

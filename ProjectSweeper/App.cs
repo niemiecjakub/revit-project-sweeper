@@ -25,8 +25,8 @@ namespace ProjectSweeper
             IServiceCollection services = new ServiceCollection();
             //SERVICES
             //PROVIDERS
-            //services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
-            services.AddSingleton<ILineStyleProvider, LineStyleProvider>();
+            services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
+            //services.AddSingleton<ILineStyleProvider, LineStyleProvider>();
             //STORES
             services.AddSingleton<CleanerStore>();
             services.AddSingleton<NavigationStore>();

@@ -18,7 +18,7 @@ namespace ProjectSweeper.ViewModels
         private readonly ObservableCollection<LineStyleViewModel> _lineStyles;
         private readonly CleanerStore _cleanerStore;
 
-        public IEnumerable<LineStyleViewModel> LineStyles => _lineStyles;
+        public IEnumerable<LineStyleViewModel> LineStyles => _lineStyles.OrderBy(x => x.Name);
 
         private bool _isLoading;
 
@@ -51,7 +51,9 @@ namespace ProjectSweeper.ViewModels
         public void UpdateLineStyles(IEnumerable<LineStyle> lineStyles)
         {
             _lineStyles.Clear();
-            Debug.WriteLine("Updating Line styles");
+            ISet<LineStyle> unusedLineStyles = lineStyles.Where(l => !l.IsUsed).ToHashSet();
+            Debug.WriteLine($"{lineStyles.Count()} -  LineStyles found - {unusedLineStyles.Count} Unused");
+
             foreach (LineStyle lineStyle in lineStyles)
             {
                 LineStyleViewModel lineStyleViewModel = new LineStyleViewModel(lineStyle);

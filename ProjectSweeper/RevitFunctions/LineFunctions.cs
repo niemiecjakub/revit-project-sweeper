@@ -14,8 +14,6 @@ namespace ProjectSweeper.RevitFunctions
         //LINE STYLES 
         public static ISet<LineStyle> GetLineStyles(Document doc)
         {
-            
-
             Debug.WriteLine("Line functions");
             ISet<LineStyle> lineStyles = new HashSet<LineStyle>();
             Category c = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Lines);
@@ -23,6 +21,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (Category lineStyle in subcats)
             {
                 LineStyle style = new LineStyle(lineStyle);
+                style.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, style); ;
                 lineStyles.Add(style);
             }
 

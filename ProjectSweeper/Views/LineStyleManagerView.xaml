@@ -31,7 +31,7 @@
         </ListView>
 
         <StackPanel Grid.Row="2">
-            <Button Content="Delete unused linestyles" />
+            <Button Content="Delete unused linestyles" Command="{Binding RemoveElementCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>

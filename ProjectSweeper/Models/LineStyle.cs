@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Models
 {
-    public class LineStyle
+    public class LineStyle : IElement
     {
         public ElementId Id { get; set; }
         public string Name { get; set; }
         public bool IsUsed { get; set; }
+        public bool CanBeRemoved {  get; set; }
         public ElementId PatternId { get; set; }
 
         public int? LineWeight { get; set; }

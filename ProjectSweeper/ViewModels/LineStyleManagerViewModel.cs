@@ -1,4 +1,5 @@
-﻿using ProjectSweeper.Commands;
+﻿using Autodesk.Revit.DB;
+using ProjectSweeper.Commands;
 using ProjectSweeper.Models;
 using ProjectSweeper.Stores;
 using System;
@@ -33,6 +34,7 @@ namespace ProjectSweeper.ViewModels
         }
 
         public ICommand LoadLineStylesCommand { get; }
+        public ICommand RemoveElementCommand { get; }
         public LineStyleManagerViewModel(CleanerStore cleanerStore)
         {
             Debug.WriteLine("new line style");
@@ -40,7 +42,25 @@ namespace ProjectSweeper.ViewModels
             _lineStyles = new ObservableCollection<LineStyleViewModel>();
             _cleanerStore = cleanerStore;
             LoadLineStylesCommand = new LoadLineStylesCommand(this, cleanerStore);
+
+            IEnumerable<IElement> elements = (IEnumerable<IElement>)_lineStyles.Where(ls => !ls.IsUsed).ToList();
+            RemoveElementCommand = new RemoveElementsCommand(cleanerStore, elements);
+
+
+            _cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
         }
+        public override void Dispose()
+        {
+            _cleanerStore.LineStyleDeleted -= OnLineStyleDeleted;
+            base.Dispose();
+        }
+
+        private void OnLineStyleDeleted(LineStyle style)
+        {
+            LineStyleViewModel lineStyleViewModel = _lineStyles.First(ls => ls.Id == style.Id);
+            _lineStyles.Remove(lineStyleViewModel);
+        }
+
         public static LineStyleManagerViewModel LoadViewModel(CleanerStore cleanerStore)
         {
             LineStyleManagerViewModel viewModel = new LineStyleManagerViewModel(cleanerStore);

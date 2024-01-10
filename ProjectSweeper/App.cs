@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectSweeper.Models;
 using ProjectSweeper.Services;
+using ProjectSweeper.Services.ElementRemover;
 using ProjectSweeper.Services.LineStyleProvider;
 using ProjectSweeper.Stores;
 using ProjectSweeper.ViewModels;
@@ -26,6 +27,7 @@ namespace ProjectSweeper
             //SERVICES
             //PROVIDERS
             services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
+            services.AddTransient<IRemoveElement, ElementRemover>(s => new ElementRemover(doc));
             //services.AddSingleton<ILineStyleProvider, LineStyleProvider>();
             //STORES
             services.AddSingleton<CleanerStore>();

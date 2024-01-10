@@ -1,4 +1,5 @@
-﻿using ProjectSweeper.Models;
+﻿using Autodesk.Revit.DB;
+using ProjectSweeper.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,7 +15,6 @@ namespace ProjectSweeper.Stores
         private readonly Cleaner _cleaner;
         private Lazy<Task> _initializeLazy;
 
-
         public IEnumerable<LineStyle> LineStyles => _lineStyles;
         public event Action<LineStyle> LineStyleDeleted;
 
@@ -23,7 +23,6 @@ namespace ProjectSweeper.Stores
             _cleaner = cleaner;
             _initializeLazy = new Lazy<Task>(Initialize);
             _lineStyles = new List<LineStyle>();
-            //_initializeLazy = new Lazy<Task>(Initialize);
         }
         private async Task Initialize()
         {
@@ -46,9 +45,18 @@ namespace ProjectSweeper.Stores
             }
         }
 
-        public void DeleteLineStyle(LineStyle lineStyle)
+        private void DeleteLineStyle(LineStyle lineStyle)
         {
             _lineStyles.Remove(lineStyle);
+
+            OnLineStyleDeleted(lineStyle);
         }
+
+        private void OnLineStyleDeleted(LineStyle lineStyle)
+        {
+            LineStyleDeleted?.Invoke(lineStyle);
+        }
+
+
     }
 }

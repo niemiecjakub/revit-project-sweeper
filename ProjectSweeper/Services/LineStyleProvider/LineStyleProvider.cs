@@ -26,8 +26,10 @@ namespace ProjectSweeper.Services.LineStyleProvider
 
             foreach (LineStyle lineStyle in lineStyles)
             {
-                var name = lineStyle.Name;
-                Debug.WriteLine($"{name}");
+                string name = lineStyle.Name;
+                bool canBeRemoved = lineStyle.CanBeRemoved;
+
+                Debug.WriteLine($"{name} -- can be removed? == {canBeRemoved}");
             }
 
             return lineStyles;

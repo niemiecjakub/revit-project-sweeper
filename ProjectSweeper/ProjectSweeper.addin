@@ -1,0 +1,14 @@
+﻿﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>sample</Name>
+		<Assembly>ProjectSweeper.dll</Assembly>
+		<AddInId>851A6434-DB60-4016-89D7-AE18E5F12E67</AddInId>
+		<FullClassName>ProjectSweeper.App</FullClassName>
+		<Text>External application</Text>
+		<Description>External application desc</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<VendorId>Jakub Niemiec</VendorId>
+		<VendorDescription>https://github.com/niemiecjakub</VendorDescription>
+	</AddIn>
+</RevitAddIns>

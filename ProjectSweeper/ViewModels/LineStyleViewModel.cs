@@ -10,13 +10,13 @@ namespace ProjectSweeper.ViewModels
 {
     public class LineStyleViewModel : ViewModelBase
     {
-        private readonly LineStyle _lineStyle;
+        private readonly LineStyleModel _lineStyle;
         public ElementId Id => _lineStyle.Id;
         public bool IsUsed => _lineStyle.IsUsed;
         public string Name => _lineStyle.Name;
         public bool CanBeRemoved => _lineStyle.CanBeRemoved;
 
-        public LineStyleViewModel(LineStyle lineStyle)
+        public LineStyleViewModel(LineStyleModel lineStyle)
         {
             _lineStyle = lineStyle;
         }

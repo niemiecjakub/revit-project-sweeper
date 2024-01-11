@@ -8,6 +8,7 @@ using ProjectSweeper.Models;
 using ProjectSweeper.RevitFunctions;
 using ProjectSweeper.Services;
 using ProjectSweeper.Services.ElementRemover;
+using ProjectSweeper.Services.LinePatternProvider;
 using ProjectSweeper.Services.LineStyleProvider;
 using ProjectSweeper.Stores;
 using ProjectSweeper.ViewModels;
@@ -28,6 +29,7 @@ namespace ProjectSweeper
             IServiceCollection services = new ServiceCollection();
             //SERVICES
             //PROVIDERS
+            services.AddSingleton<ILinePatternProvider, LinePatternProvider>(s => new LinePatternProvider(doc));
             services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
             services.AddTransient<IElementRemover, ElementRemover>(s => new ElementRemover(doc));
             //services.AddSingleton<ILineStyleProvider, LineStyleProvider>();
@@ -45,19 +47,20 @@ namespace ProjectSweeper
             });
 
             //MODELS
-            services.AddSingleton<Cleaner>(s => new Cleaner(s.GetRequiredService<LineStyleList>()));
-            services.AddTransient<LineStyleList>();
+            services.AddSingleton<Cleaner>(s => new Cleaner(s.GetRequiredService<LineStyleModelList>(), s.GetRequiredService<LinePatternModelList>()));
+            services.AddTransient<LineStyleModelList>();
+            services.AddTransient<LinePatternModelList>();
 
             //VIEW MODELS
             services.AddTransient<NavigationBarViewModel>(CreateNavigationBarViewModel);
             services.AddTransient<LineStyleManagerViewModel>(s => CreateLineStyleManagerViewModel(s));
-            services.AddTransient<LinePatternViewModel>();
-
+            services.AddTransient<LinePatternManagerViewModel>(s => CreateLinePatternManagerViewModel(s));
 
             services.AddSingleton<MainViewModel>();
 
             _serviceProvider = services.BuildServiceProvider();
         }
+
 
         private NavigationBarViewModel CreateNavigationBarViewModel(IServiceProvider serviceProvider)
         {
@@ -77,15 +80,20 @@ namespace ProjectSweeper
 
         private INavigationService CreateLinePatternNavigationService(IServiceProvider serviceProvider)
         {
-            return new LayoutNavigationService<LinePatternViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
-                () => serviceProvider.GetRequiredService<LinePatternViewModel>(),
+            return new LayoutNavigationService<LinePatternManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => serviceProvider.GetRequiredService<LinePatternManagerViewModel>(),
                 () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
             );
         }
 
-        private LineStyleManagerViewModel CreateLineStyleManagerViewModel(IServiceProvider services)
+        private LineStyleManagerViewModel CreateLineStyleManagerViewModel(IServiceProvider serviceProvider)
         {
-            return LineStyleManagerViewModel.LoadViewModel(services.GetRequiredService<CleanerStore>());
+            return LineStyleManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>());
+        }
+
+        private LinePatternManagerViewModel CreateLinePatternManagerViewModel(IServiceProvider serviceProvider)
+        {
+            return LinePatternManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>());
         }
 
 

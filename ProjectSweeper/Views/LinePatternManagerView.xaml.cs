@@ -18,9 +18,9 @@ namespace ProjectSweeper.Views
     /// <summary>
     /// Interaction logic for LinePatternView.xaml
     /// </summary>
-    public partial class LinePatternView : UserControl
+    public partial class LinePatternManagerView : UserControl
     {
-        public LinePatternView()
+        public LinePatternManagerView()
         {
             InitializeComponent();
         }

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectSweeper.Services.LineStyleProvider
+namespace ProjectSweeper.Services.LinePatternProvider
 {
-    public interface ILineStyleProvider
+    public interface ILinePatternProvider
     {
-        Task<IEnumerable<LineStyleModel>> GetAllElements();
+        Task<IEnumerable<LinePatternModel>> GetAllElements();
     }
 }

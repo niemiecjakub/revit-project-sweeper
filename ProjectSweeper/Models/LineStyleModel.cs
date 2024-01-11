@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Models
 {
-    public class LineStyle : IElement
+    public class LineStyleModel : IElement
     {
         public ElementId Id { get; set; }
         public string Name { get; set; }
@@ -19,7 +19,7 @@ namespace ProjectSweeper.Models
         public Color Color { get; set; }
 
 
-        public LineStyle(string name, ElementId id, ElementId patternId, int? lineWeight, Color color)
+        public LineStyleModel(string name, ElementId id, ElementId patternId, int? lineWeight, Color color)
         {
             Name = name;
             Id = id;
@@ -28,7 +28,7 @@ namespace ProjectSweeper.Models
             Color = color;
         }
 
-        public LineStyle(Category lineStyle)
+        public LineStyleModel(Category lineStyle)
         {
             Id = lineStyle.Id;
             Name = lineStyle.Name;

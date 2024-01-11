@@ -13,24 +13,33 @@ namespace ProjectSweeper.Stores
     {
         private readonly Cleaner _cleaner;
         private Lazy<Task> _initializeLazy;
-        private readonly List<LineStyle> _lineStyles;
+        private readonly List<LineStyleModel> _lineStyles;
+        private readonly List<LinePatternModel> _linePatterns;
 
-        public IEnumerable<LineStyle> LineStyles => _lineStyles;
+        public IEnumerable<LineStyleModel> LineStyles => _lineStyles;
+        public IEnumerable<LinePatternModel> LinePatterns => _linePatterns;
 
-        public event Action<IEnumerable<LineStyle>> LineStyleDeleted;
+        public event Action<IEnumerable<LineStyleModel>> LineStyleDeleted;
+        public event Action<IEnumerable<LinePatternModel>> LinePatternDeleted;
 
         public CleanerStore(Cleaner cleaner)
         {
             _cleaner = cleaner;
             _initializeLazy = new Lazy<Task>(Initialize);
-            _lineStyles = new List<LineStyle>();
+            _lineStyles = new List<LineStyleModel>();
+            _linePatterns = new List<LinePatternModel>();
         }
         private async Task Initialize()
         {
             Debug.WriteLine("Initializing lazy");
-            IEnumerable<LineStyle> lineStyles = await _cleaner.GetAllLineStyles();
+            IEnumerable<LineStyleModel> lineStyles = await _cleaner.GetAllLineStyles();
             _lineStyles.Clear();
             _lineStyles.AddRange(lineStyles);
+
+            IEnumerable<LinePatternModel> linePatterns = await _cleaner.GetAllLinePatterns();
+            _linePatterns.Clear();
+            _linePatterns.AddRange(linePatterns);
+
         }
 
         public async Task Load()
@@ -46,15 +55,14 @@ namespace ProjectSweeper.Stores
             }
         }
 
-        public async Task DeleteLineStyle(IEnumerable<LineStyle> lineStyle)
+        public async Task DeleteLineStyle(IEnumerable<LineStyleModel> lineStyles)
         {
             Debug.WriteLine("STORE: Inside store");
-            await _cleaner.LineStyleDeleted(lineStyle);
+            await _cleaner.LineStyleDeleted(lineStyles);
 
-            // Create a copy of the collection to avoid "collection was modified" error
-            List<LineStyle> lineStylesCopy = new List<LineStyle>(_lineStyles);
+            List<LineStyleModel> lineStylesCopy = new List<LineStyleModel>(_lineStyles);
 
-            foreach (LineStyle ls in lineStyle)
+            foreach (LineStyleModel ls in lineStyles)
             {
                 lineStylesCopy.Remove(ls);
             }
@@ -68,9 +76,36 @@ namespace ProjectSweeper.Stores
             OnLineStyleDeleted(_lineStyles);
         }
 
-        private void OnLineStyleDeleted(IEnumerable<LineStyle> lineStyle)
+        private void OnLineStyleDeleted(IEnumerable<LineStyleModel> lineStyles)
         {
-            LineStyleDeleted?.Invoke(lineStyle);
+            LineStyleDeleted?.Invoke(lineStyles);
+        }
+
+
+        public async Task DeleteLinePattern(IEnumerable<LinePatternModel> linePatterns)
+        {
+            Debug.WriteLine("STORE: Inside store");
+            await _cleaner.LinePatternDeleted(linePatterns);
+
+            List<LinePatternModel> linePatternsCopy = new List<LinePatternModel>(_linePatterns);
+
+            foreach (LinePatternModel lp in linePatterns)
+            {
+                linePatternsCopy.Remove(lp);
+            }
+
+            // Assign the updated collection back to _lineStyles
+            _linePatterns.Clear();
+            _linePatterns.AddRange(linePatternsCopy);
+
+            Debug.WriteLine($"STORE: Left {_linePatterns.Count} linepatterns");
+
+            OnLinePatternDeleted(_linePatterns);
+        }
+
+        private void OnLinePatternDeleted(IEnumerable<LinePatternModel> linePatterns)
+        {
+            LinePatternDeleted?.Invoke(linePatterns);
         }
 
 

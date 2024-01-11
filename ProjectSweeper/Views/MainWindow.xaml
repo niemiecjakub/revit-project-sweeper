@@ -15,8 +15,8 @@
                 <components:Layout />
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type vms:LinePatternViewModel}">
-                <view:LinePatternView />
+            <DataTemplate DataType="{x:Type vms:LinePatternManagerViewModel}">
+                <view:LinePatternManagerView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type vms:LineStyleManagerViewModel}">
                 <view:LineStyleManagerView />

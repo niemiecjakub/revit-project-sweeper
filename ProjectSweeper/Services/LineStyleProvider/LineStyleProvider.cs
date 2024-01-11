@@ -19,12 +19,12 @@ namespace ProjectSweeper.Services.LineStyleProvider
             _doc = doc;
         }
 
-        public async Task<IEnumerable<LineStyle>> GetAllElements()
+        public async Task<IEnumerable<LineStyleModel>> GetAllElements()
         {
             Debug.WriteLine("Getting all linestyles in provider");
-            IEnumerable<LineStyle> lineStyles = LineFunctions.GetLineStyles(_doc);
+            IEnumerable<LineStyleModel> lineStyles = LineFunctions.GetLineStyles(_doc);
 
-            foreach (LineStyle lineStyle in lineStyles)
+            foreach (LineStyleModel lineStyle in lineStyles)
             {
                 string name = lineStyle.Name;
                 bool canBeRemoved = lineStyle.CanBeRemoved;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Autodesk.Revit.DB;
+using ProjectSweeper.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,12 +11,15 @@ namespace ProjectSweeper.ViewModels
 {
     public class LinePatternViewModel : ViewModelBase
     {
-        public string Name { get; set; }
+        private readonly LinePatternModel _linePattern;
+        public ElementId Id => _linePattern.Id;
+        public bool IsUsed => _linePattern.IsUsed;
+        public string Name => _linePattern.Name;
+        public bool CanBeRemoved => _linePattern.CanBeRemoved;
 
-        public LinePatternViewModel()
+        public LinePatternViewModel(LinePatternModel linePattern)
         {
-            Debug.WriteLine("new line pattern");
-            Name = "pattern";
+            _linePattern = linePattern;
         }
     }
 }

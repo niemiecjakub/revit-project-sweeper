@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Models
 {
-    public class LineStyleList : ViewModelBase
+    public class LineStyleModelList
     {
         private readonly ILineStyleProvider _lineStyleProvider;
         private readonly IElementRemover _elementRemover;
-        public LineStyleList(ILineStyleProvider lineStyleProvider, IElementRemover elementRemover)
+        public LineStyleModelList(ILineStyleProvider lineStyleProvider, IElementRemover elementRemover)
         {
             _lineStyleProvider = lineStyleProvider;
             _elementRemover = elementRemover;
         }
 
-        public async Task<IEnumerable<LineStyle>> GetAllLineStyles()
+        public async Task<IEnumerable<LineStyleModel>> GetAllLineStyles()
         {
             return await _lineStyleProvider.GetAllElements();
         }
 
-        public async Task DeleteLineStyle(IEnumerable<LineStyle> lineStyle)
+        public async Task DeleteLineStyle(IEnumerable<LineStyleModel> lineStyle)
         {
             Debug.WriteLine($"LINE STYLES LIST: inside line styles list"); ;
             IEnumerable<ElementId> elementIds = lineStyle.Select(x => x.Id);

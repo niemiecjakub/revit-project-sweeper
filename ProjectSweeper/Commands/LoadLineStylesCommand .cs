@@ -31,7 +31,7 @@ namespace ProjectSweeper.Commands
             }
             catch (Exception)
             {
-                MessageBox.Show("Failed to load games", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to load line styles", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

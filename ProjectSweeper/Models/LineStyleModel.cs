@@ -17,12 +17,13 @@ namespace ProjectSweeper.Models
 
         public int? LineWeight { get; set; }
         public Color Color { get; set; }
+        public ModelTypes ModelType { get; set; } = ModelTypes.LineStyle;
 
 
         public LineStyleModel(string name, ElementId id, ElementId patternId, int? lineWeight, Color color)
         {
-            Name = name;
             Id = id;
+            Name = name;
             PatternId = patternId;
             LineWeight = lineWeight;
             Color = color;

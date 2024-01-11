@@ -21,16 +21,16 @@ namespace ProjectSweeper.Models
             _elementRemover = elementRemover;
         }
 
-        public async Task<IEnumerable<LineStyleModel>> GetAllLineStyles()
+        public async Task<IEnumerable<IElement>> GetAllLineStyles()
         {
             return await _lineStyleProvider.GetAllElements();
         }
 
-        public async Task DeleteLineStyle(IEnumerable<LineStyleModel> lineStyle)
+        public void DeleteLineStyle(IEnumerable<IElement> lineStyle)
         {
             Debug.WriteLine($"LINE STYLES LIST: inside line styles list"); ;
             IEnumerable<ElementId> elementIds = lineStyle.Select(x => x.Id);
-            await _elementRemover.Remove(elementIds);
+            _elementRemover.Remove(elementIds);
         }
     }
 }

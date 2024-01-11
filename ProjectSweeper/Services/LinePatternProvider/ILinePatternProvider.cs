@@ -9,6 +9,6 @@ namespace ProjectSweeper.Services.LinePatternProvider
 {
     public interface ILinePatternProvider
     {
-        Task<IEnumerable<LinePatternModel>> GetAllElements();
+        Task<IEnumerable<IElement>> GetAllElements();
     }
 }

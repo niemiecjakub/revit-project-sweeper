@@ -13,5 +13,6 @@ namespace ProjectSweeper.Models
         string Name { get; set; }
         bool IsUsed { get; set; }
         bool CanBeRemoved { get; set; }
+        ModelTypes ModelType { get; set; }
     }
 }

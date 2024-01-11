@@ -23,7 +23,7 @@ namespace ProjectSweeper.Services.ElementRemover
         {
             _doc = doc;
         }
-        public async Task Remove(IEnumerable<ElementId> eIds)
+        public void Remove(IEnumerable<ElementId> eIds)
         {
             Debug.WriteLine($"REMVOER: inside remover");
             try

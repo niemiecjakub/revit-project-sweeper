@@ -22,16 +22,16 @@ namespace ProjectSweeper.Models
             _elementRemover = elementRemover;
         }
 
-        public async Task<IEnumerable<LinePatternModel>> GetAllLinePatterns()
+        public async Task<IEnumerable<IElement>> GetAllLinePatterns()
         {
             return await _linePatternProvider.GetAllElements();
         }
 
-        public async Task DeleteLinePatetrn(IEnumerable<LinePatternModel> linePatterns)
+        public void DeleteLinePatetrn(IEnumerable<IElement> linePatterns)
         {
             Debug.WriteLine($"LINE PATTERN LIST: inside line pattern list"); ;
             IEnumerable<ElementId> elementIds = linePatterns.Select(x => x.Id);
-            await _elementRemover.Remove(elementIds);
+            _elementRemover.Remove(elementIds);
         }
     }
 }

@@ -18,26 +18,31 @@ namespace ProjectSweeper.Models
             _linePatternList = linePatternList;
         }
 
-        public async Task<IEnumerable<LineStyleModel>> GetAllLineStyles()
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<IElement>> GetAllLineStyles()
         {
             return await _lineStyleList.GetAllLineStyles();
         }
-        public async Task LineStyleDeleted(IEnumerable<LineStyleModel> lineStyles)
+        public void LineStyleDeleted(IEnumerable<IElement> lineStyles)
         {
             Debug.WriteLine("CLEANER: Inside cleaner");
-            await _lineStyleList.DeleteLineStyle(lineStyles);
+            _lineStyleList.DeleteLineStyle(lineStyles);
         }
 
 
 
-        public async Task<IEnumerable<LinePatternModel>> GetAllLinePatterns()
+        public async Task<IEnumerable<IElement>> GetAllLinePatterns()
         {
             return await _linePatternList.GetAllLinePatterns();
         }
-        public async Task LinePatternDeleted(IEnumerable<LinePatternModel> linePatterns)
+        public void LinePatternDeleted(IEnumerable<IElement> linePatterns)
         {
             Debug.WriteLine("CLEANER: Inside cleaner");
-            await _linePatternList.DeleteLinePatetrn(linePatterns);
+            _linePatternList.DeleteLinePatetrn(linePatterns);
         }
 
     }

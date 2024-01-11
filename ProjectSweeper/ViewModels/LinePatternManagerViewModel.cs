@@ -40,13 +40,11 @@ namespace ProjectSweeper.ViewModels
 
             _cleanerStore = cleanerStore;
             _linePatterns = new ObservableCollection<LinePatternViewModel>();
+
             LoadLinePatternsCommand = new LoadLinePatternsCommand(this, cleanerStore);
+            RemoveLinePatternsCommand = new GeneralRemoveCommand(cleanerStore, _cleanerStore.LinePatterns);
 
-            //IEnumerable<LineStyleViewModel> lineStyleViewModelsToBeDeleted = _lineStyles.Where(ls => !ls.IsUsed && ls.CanBeRemoved);
-            //RemoveElementCommand = new RemoveElementsCommand(cleanerStore, lineStyleViewModelsToBeDeleted);
-            RemoveLinePatternsCommand = new RemoveLinePatternsCommand(cleanerStore);
-
-            //_cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
+            
             _cleanerStore.LinePatternDeleted += OnLinePatternsDeleted;
         }
 
@@ -56,12 +54,11 @@ namespace ProjectSweeper.ViewModels
             base.Dispose();
         }
 
-        private void OnLinePatternsDeleted(IEnumerable<LinePatternModel> linePatternsToBeLeft)
+        private void OnLinePatternsDeleted(IEnumerable<IElement> linePatternsToBeLeft)
         {
             ObservableCollection<LinePatternViewModel> lpToBeLeft = new ObservableCollection<LinePatternViewModel>();
-            foreach (LinePatternModel style in linePatternsToBeLeft.ToList())
+            foreach (IElement style in linePatternsToBeLeft.ToList())
             {
-                // Use ToList() to create a copy of the collection, avoiding modification during iteration
                 LinePatternViewModel linePatternViewModel = _linePatterns.FirstOrDefault(lp => lp.Id == style.Id);
                 if (linePatternViewModel != null)
                 {
@@ -69,7 +66,7 @@ namespace ProjectSweeper.ViewModels
                 }
             }
             _linePatterns = lpToBeLeft;
-            OnPropertyChanged(nameof(LinePatterns)); // Notify about the change if needed
+            OnPropertyChanged(nameof(LinePatterns));
         }
 
         public static LinePatternManagerViewModel LoadViewModel(CleanerStore cleanerStore)
@@ -79,16 +76,17 @@ namespace ProjectSweeper.ViewModels
             return viewModel;
         }
 
-        public void UpdateLinePatterns(IEnumerable<LinePatternModel> linePatterns)
+        public void UpdateLinePatterns(IEnumerable<IElement> linePatterns)
         {
             _linePatterns.Clear();
-            ISet<LinePatternModel> unusedLinePatterns = linePatterns.Where(l => !l.IsUsed).ToHashSet();
-            ISet<LinePatternModel> unusedLinePatternsToBeRemoved = unusedLinePatterns.Where(l => l.CanBeRemoved).ToHashSet();
+            ISet<IElement> unusedLinePatterns = linePatterns.Where(l => !l.IsUsed).ToHashSet();
+            ISet<IElement> unusedLinePatternsToBeRemoved = unusedLinePatterns.Where(l => l.CanBeRemoved).ToHashSet();
             Debug.WriteLine($"{linePatterns.Count()} -  Line Patterns found - {unusedLinePatterns.Count} Unused - out of which {unusedLinePatternsToBeRemoved.Count} can be removed");
 
-            foreach (LinePatternModel linePattern in linePatterns)
+            foreach (IElement linePattern in linePatterns)
             {
-                LinePatternViewModel linePatternViewModel = new LinePatternViewModel(linePattern);
+                LinePatternModel linePatternModel = new LinePatternModel(linePattern.Name, linePattern.Id);
+                LinePatternViewModel linePatternViewModel = new LinePatternViewModel(linePatternModel);
                 _linePatterns.Add(linePatternViewModel);
             }
         }

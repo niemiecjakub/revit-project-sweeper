@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Controls;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
@@ -53,7 +54,8 @@ namespace ProjectSweeper
 
             //VIEW MODELS
             services.AddTransient<NavigationBarViewModel>(CreateNavigationBarViewModel);
-            services.AddTransient<LineStyleManagerViewModel>(s => CreateLineStyleManagerViewModel(s));
+            services.AddTransient<LineStyleManagerViewModel>((s) => CreateLineStyleManagerViewModel(s));
+
             services.AddTransient<LinePatternManagerViewModel>(s => CreateLinePatternManagerViewModel(s));
 
             services.AddSingleton<MainViewModel>();

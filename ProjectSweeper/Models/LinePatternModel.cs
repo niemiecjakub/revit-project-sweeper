@@ -15,6 +15,7 @@ namespace ProjectSweeper.Models
         public bool IsUsed { get; set; }
 
         public bool CanBeRemoved {get; set; }
+        public ModelTypes ModelType { get; set; } = ModelTypes.LinePattern;
 
         public LinePatternModel(string name, ElementId id)
         {

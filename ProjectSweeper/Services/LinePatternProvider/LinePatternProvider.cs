@@ -18,10 +18,10 @@ namespace ProjectSweeper.Services.LinePatternProvider
         {
             _doc = doc;
         }
-        public async Task<IEnumerable<LinePatternModel>> GetAllElements()
+        public async Task<IEnumerable<IElement>> GetAllElements()
         {
             Debug.WriteLine("Getting all linePatterns in provider");
-            IEnumerable<LinePatternModel> linePatterns = LineFunctions.GetLinePatterns(_doc);
+            IEnumerable<IElement> linePatterns = LineFunctions.GetLinePatterns(_doc);
             return linePatterns;
         }
     }

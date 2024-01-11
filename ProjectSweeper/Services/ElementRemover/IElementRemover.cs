@@ -10,6 +10,6 @@ namespace ProjectSweeper.Services.ElementRemover
 {
     public interface IElementRemover
     {
-        Task Remove(IEnumerable<ElementId> eIds);
+        void Remove(IEnumerable<ElementId> eIds);
     }
 }

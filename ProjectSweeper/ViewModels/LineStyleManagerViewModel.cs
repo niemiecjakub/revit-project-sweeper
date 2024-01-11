@@ -20,7 +20,6 @@ namespace ProjectSweeper.ViewModels
     {
         public string Name => "Line style manager";
         private readonly CleanerStore _cleanerStore;
-
         private ObservableCollection<LineStyleViewModel> _lineStyles;
         public ObservableCollection<LineStyleViewModel> LineStyles => _lineStyles;
 
@@ -36,6 +35,7 @@ namespace ProjectSweeper.ViewModels
             }
         }
 
+
         public ICommand LoadLineStylesCommand { get; }
         public ICommand RemoveLineStylesCommand { get; }
         public LineStyleManagerViewModel(CleanerStore cleanerStore)
@@ -45,10 +45,7 @@ namespace ProjectSweeper.ViewModels
             _lineStyles = new ObservableCollection<LineStyleViewModel>();
             _cleanerStore = cleanerStore;
             LoadLineStylesCommand = new LoadLineStylesCommand(this, cleanerStore);
-
-            //IEnumerable<LineStyleViewModel> lineStyleViewModelsToBeDeleted = _lineStyles.Where(ls => !ls.IsUsed && ls.CanBeRemoved);
-            //RemoveElementCommand = new RemoveElementsCommand(cleanerStore, lineStyleViewModelsToBeDeleted);
-            RemoveLineStylesCommand = new RemoveLineStylesCommand(cleanerStore);
+            RemoveLineStylesCommand = new GeneralRemoveCommand(cleanerStore, _cleanerStore.LineStyles);
 
             _cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
         }
@@ -60,12 +57,11 @@ namespace ProjectSweeper.ViewModels
             base.Dispose();
         }
 
-        private void OnLineStyleDeleted(IEnumerable<LineStyleModel> lineStylesToBeLeft)
+        private void OnLineStyleDeleted(IEnumerable<IElement> lineStylesToBeLeft)
         {
             ObservableCollection<LineStyleViewModel> lsToBeLeft = new ObservableCollection<LineStyleViewModel>();
-            foreach (LineStyleModel style in lineStylesToBeLeft.ToList())
+            foreach (IElement style in lineStylesToBeLeft.ToList())
             {
-                // Use ToList() to create a copy of the collection, avoiding modification during iteration
                 LineStyleViewModel lineStyleViewModel = _lineStyles.FirstOrDefault(ls => ls.Id == style.Id);
                 if (lineStyleViewModel != null)
                 {
@@ -73,7 +69,7 @@ namespace ProjectSweeper.ViewModels
                 }
             }
             _lineStyles = lsToBeLeft;
-            OnPropertyChanged(nameof(LineStyles)); // Notify about the change if needed
+            OnPropertyChanged(nameof(LineStyles));
         }
 
 
@@ -85,16 +81,18 @@ namespace ProjectSweeper.ViewModels
             return viewModel;
         }
 
-        public void UpdateLineStyles(IEnumerable<LineStyleModel> lineStyles)
+        public void UpdateLineStyles(IEnumerable<IElement> lineStyles)
         {
             _lineStyles.Clear();
-            ISet<LineStyleModel> unusedLineStyles = lineStyles.Where(l => !l.IsUsed).ToHashSet();
-            ISet<LineStyleModel> unusedLineStylesToBeRemoved = unusedLineStyles.Where(l => l.CanBeRemoved).ToHashSet();
+            ISet<IElement> unusedLineStyles = lineStyles.Where(l => !l.IsUsed).ToHashSet();
+            ISet<IElement> unusedLineStylesToBeRemoved = unusedLineStyles.Where(l => l.CanBeRemoved).ToHashSet();
             Debug.WriteLine($"{lineStyles.Count()} -  LineStyles found - {unusedLineStyles.Count} Unused - out of which {unusedLineStylesToBeRemoved.Count} can be removed");
 
-            foreach (LineStyleModel lineStyle in lineStyles)
+            foreach (IElement lineStyle in lineStyles)
             {
-                LineStyleViewModel lineStyleViewModel = new LineStyleViewModel(lineStyle);
+                //Category lineStyleCategory = _doc.GetElement(lineStyle.Id).Category;
+                //LineStyleModel lineStyleModel =new LineStyleModel(lineStyleCategory);
+                LineStyleViewModel lineStyleViewModel = new LineStyleViewModel(lineStyle as LineStyleModel);
                 _lineStyles.Add(lineStyleViewModel);
             }
         }

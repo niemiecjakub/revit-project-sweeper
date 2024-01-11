@@ -1,9 +1,11 @@
 ﻿using System;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectSweeper.Models;
+using ProjectSweeper.RevitFunctions;
 using ProjectSweeper.Services;
 using ProjectSweeper.Services.ElementRemover;
 using ProjectSweeper.Services.LineStyleProvider;
@@ -27,16 +29,14 @@ namespace ProjectSweeper
             //SERVICES
             //PROVIDERS
             services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
-            services.AddTransient<IRemoveElement, ElementRemover>(s => new ElementRemover(doc));
+            services.AddTransient<IElementRemover, ElementRemover>();
             //services.AddSingleton<ILineStyleProvider, LineStyleProvider>();
             //STORES
             services.AddSingleton<CleanerStore>();
             services.AddSingleton<NavigationStore>();
 
-
             //NAVIGATION SERVICE
             services.AddSingleton<INavigationService>(s => CreateLineStyleNavigationService(s));
-
 
             //WINDOWS
             services.AddSingleton<MainWindow>(s => new MainWindow()
@@ -50,9 +50,7 @@ namespace ProjectSweeper
 
             //VIEW MODELS
             services.AddTransient<NavigationBarViewModel>(CreateNavigationBarViewModel);
-
             services.AddTransient<LineStyleManagerViewModel>(s => CreateLineStyleManagerViewModel(s));
-
             services.AddTransient<LinePatternViewModel>();
 
 

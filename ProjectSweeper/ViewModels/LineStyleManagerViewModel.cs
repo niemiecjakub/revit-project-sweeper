@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using ProjectSweeper.Commands;
 using ProjectSweeper.Models;
+using ProjectSweeper.RevitFunctions;
 using ProjectSweeper.Stores;
 using System;
 using System.Collections.Generic;
@@ -49,32 +51,34 @@ namespace ProjectSweeper.ViewModels
 
             //_cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
         }
+
+
         public override void Dispose()
         {
             //_cleanerStore.LineStyleDeleted -= OnLineStyleDeleted;
             base.Dispose();
         }
 
-        //private void OnLineStyleDeleted(LineStyle style)
-        //{
-        //    LineStyleViewModel lineStyleViewModel = _lineStyles.First(ls => ls.Id == style.Id);
-        //    Debug.WriteLine($"MANAGER: ON {style.Name} DELETED");
-        //    _lineStyles.Remove(lineStyleViewModel);
-        //    //if (_lineStyles.Contains(lineStyleViewModel))
-        //    //{
-        //    //    Debug.WriteLine("CONTAINS");
-        //    //    try
-        //    //    {
-        //    //        _lineStyles.Remove(lineStyleViewModel);
-        //    //        Debug.WriteLine("DELETED");
+        private void OnLineStyleDeleted(LineStyle style)
+        {
+            //LineStyleViewModel lineStyleViewModel = _lineStyles.First(ls => ls.Id == style.Id);
+            //Debug.WriteLine($"MANAGER: ON {style.Name} DELETED");
+            //_lineStyles.Remove(lineStyleViewModel);
+            //if (_lineStyles.Contains(lineStyleViewModel))
+            //{
+            //    Debug.WriteLine("CONTAINS");
+            //    try
+            //    {
+            //        _lineStyles.Remove(lineStyleViewModel);
+            //        Debug.WriteLine("DELETED");
 
-        //    //    }
-        //    //    catch (Exception ex)
-        //    //    {
-        //    //        Debug.WriteLine(ex.ToString());
-        //    //    }
-        //    //}
-        //}
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Debug.WriteLine(ex.ToString());
+            //    }
+            //}
+        }
 
         public static LineStyleManagerViewModel LoadViewModel(CleanerStore cleanerStore)
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Services.ElementRemover
 {
-    public interface IRemoveElement
+    public interface IElementRemover
     {
         Task Remove(ElementId eId);
     }

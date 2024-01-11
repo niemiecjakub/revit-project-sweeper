@@ -13,8 +13,8 @@ namespace ProjectSweeper.Models
     public class LineStyleList : ViewModelBase
     {
         private readonly ILineStyleProvider _lineStyleProvider;
-        private readonly IRemoveElement _elementRemover;
-        public LineStyleList(ILineStyleProvider lineStyleProvider, IRemoveElement elementRemover)
+        private readonly IElementRemover _elementRemover;
+        public LineStyleList(ILineStyleProvider lineStyleProvider, IElementRemover elementRemover)
         {
             _lineStyleProvider = lineStyleProvider;
             _elementRemover = elementRemover;

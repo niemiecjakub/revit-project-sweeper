@@ -15,11 +15,11 @@ namespace ProjectSweeper.Models
             _lineStyleList = lineStyleList;
         }
 
-        public IEnumerable<LineStyle> GetAllLineStyles()
+        public async Task<IEnumerable<LineStyle>> GetAllLineStyles()
         {
-            return _lineStyleList.GetAllLineStyles();
+            return await _lineStyleList.GetAllLineStyles();
         }
-        public async Task LineStyleDeleted(LineStyle lineStyle)
+        public async Task LineStyleDeleted(IEnumerable<LineStyle> lineStyle)
         {
             Debug.WriteLine("CLEANER: Inside cleaner");
             await _lineStyleList.DeleteLineStyle(lineStyle);

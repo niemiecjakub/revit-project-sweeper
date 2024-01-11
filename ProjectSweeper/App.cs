@@ -29,7 +29,7 @@ namespace ProjectSweeper
             //SERVICES
             //PROVIDERS
             services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
-            services.AddTransient<IElementRemover, ElementRemover>();
+            services.AddTransient<IElementRemover, ElementRemover>(s => new ElementRemover(doc));
             //services.AddSingleton<ILineStyleProvider, LineStyleProvider>();
             //STORES
             services.AddSingleton<CleanerStore>();
@@ -98,7 +98,7 @@ namespace ProjectSweeper
             initialNavigationService.Navigate();
 
             MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            mainWindow.ShowDialog();
 
             return Result.Succeeded;
         }

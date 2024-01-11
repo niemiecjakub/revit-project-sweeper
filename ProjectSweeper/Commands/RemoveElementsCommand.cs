@@ -12,23 +12,17 @@ namespace ProjectSweeper.Commands
     public class RemoveElementsCommand : AsyncCommandBase
     {
         private readonly CleanerStore _cleanerStore;
-        private readonly IEnumerable<LineStyleViewModel> _elementsToBeDeleted;
 
-        public RemoveElementsCommand(CleanerStore cleanerStore, IEnumerable<LineStyleViewModel> elementsToBeDeleted)
+        public RemoveElementsCommand(CleanerStore cleanerStore)
         {
             _cleanerStore = cleanerStore;
-            _elementsToBeDeleted = elementsToBeDeleted;
         }
 
         public override async Task ExecuteAsync(object parameter)
         {
-            Debug.WriteLine($"Got {_elementsToBeDeleted.Count()} to be deleted");
-            foreach (LineStyleViewModel lineStyleViewModel in _elementsToBeDeleted)
-            {
-                LineStyle ls = _cleanerStore.LineStyles.Where(e => e.Id == lineStyleViewModel.Id).First();
-                Debug.WriteLine($"COMMAND: ATTEMPTING TO DELETE   {ls.Name}");
-                await _cleanerStore.DeleteLineStyle(ls);
-            }
+            IEnumerable <LineStyle> elementsToBeDeleted = _cleanerStore.LineStyles.Where(x => !x.IsUsed && x.CanBeRemoved);
+            Debug.WriteLine($"Got {elementsToBeDeleted.Count()} to be deleted");
+            await _cleanerStore.DeleteLineStyle(elementsToBeDeleted);
         }
     }
 }

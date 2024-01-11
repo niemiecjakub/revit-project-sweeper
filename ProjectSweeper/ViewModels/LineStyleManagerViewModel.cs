@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ProjectSweeper.ViewModels
@@ -18,10 +19,10 @@ namespace ProjectSweeper.ViewModels
     public class LineStyleManagerViewModel : ViewModelBase
     {
         public string Name => "Line style";
-        private readonly ObservableCollection<LineStyleViewModel> _lineStyles;
         private readonly CleanerStore _cleanerStore;
 
-        public IEnumerable<LineStyleViewModel> LineStyles => _lineStyles.OrderBy(x => x.Name);
+        private ObservableCollection<LineStyleViewModel> _lineStyles;
+        public ObservableCollection<LineStyleViewModel> LineStyles => _lineStyles;
 
         private bool _isLoading;
 
@@ -45,40 +46,37 @@ namespace ProjectSweeper.ViewModels
             _cleanerStore = cleanerStore;
             LoadLineStylesCommand = new LoadLineStylesCommand(this, cleanerStore);
 
-            IEnumerable<LineStyleViewModel> lineStyleViewModelsToBeDeleted = _lineStyles.Where(ls => !ls.IsUsed);
-            RemoveElementCommand = new RemoveElementsCommand(cleanerStore, lineStyleViewModelsToBeDeleted);
+            //IEnumerable<LineStyleViewModel> lineStyleViewModelsToBeDeleted = _lineStyles.Where(ls => !ls.IsUsed && ls.CanBeRemoved);
+            //RemoveElementCommand = new RemoveElementsCommand(cleanerStore, lineStyleViewModelsToBeDeleted);
+            RemoveElementCommand = new RemoveElementsCommand(cleanerStore);
 
-
-            //_cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
+            _cleanerStore.LineStyleDeleted += OnLineStyleDeleted;
         }
 
 
         public override void Dispose()
         {
-            //_cleanerStore.LineStyleDeleted -= OnLineStyleDeleted;
+            _cleanerStore.LineStyleDeleted -= OnLineStyleDeleted;
             base.Dispose();
         }
 
-        private void OnLineStyleDeleted(LineStyle style)
+        private void OnLineStyleDeleted(IEnumerable<LineStyle> lineStylesToBeLeft)
         {
-            //LineStyleViewModel lineStyleViewModel = _lineStyles.First(ls => ls.Id == style.Id);
-            //Debug.WriteLine($"MANAGER: ON {style.Name} DELETED");
-            //_lineStyles.Remove(lineStyleViewModel);
-            //if (_lineStyles.Contains(lineStyleViewModel))
-            //{
-            //    Debug.WriteLine("CONTAINS");
-            //    try
-            //    {
-            //        _lineStyles.Remove(lineStyleViewModel);
-            //        Debug.WriteLine("DELETED");
-
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Debug.WriteLine(ex.ToString());
-            //    }
-            //}
+            ObservableCollection<LineStyleViewModel> lsToBeLeft = new ObservableCollection<LineStyleViewModel>();
+            foreach (LineStyle style in lineStylesToBeLeft.ToList())
+            {
+                // Use ToList() to create a copy of the collection, avoiding modification during iteration
+                LineStyleViewModel lineStyleViewModel = _lineStyles.FirstOrDefault(ls => ls.Id == style.Id);
+                if (lineStyleViewModel != null)
+                {
+                    lsToBeLeft.Add(lineStyleViewModel);
+                }
+            }
+            _lineStyles = lsToBeLeft;
+            OnPropertyChanged(nameof(LineStyles)); // Notify about the change if needed
         }
+
+
 
         public static LineStyleManagerViewModel LoadViewModel(CleanerStore cleanerStore)
         {
@@ -91,7 +89,8 @@ namespace ProjectSweeper.ViewModels
         {
             _lineStyles.Clear();
             ISet<LineStyle> unusedLineStyles = lineStyles.Where(l => !l.IsUsed).ToHashSet();
-            Debug.WriteLine($"{lineStyles.Count()} -  LineStyles found - {unusedLineStyles.Count} Unused");
+            ISet<LineStyle> unusedLineStylesToBeRemoved = unusedLineStyles.Where(l => l.CanBeRemoved).ToHashSet();
+            Debug.WriteLine($"{lineStyles.Count()} -  LineStyles found - {unusedLineStyles.Count} Unused - out of which {unusedLineStylesToBeRemoved.Count} can be removed");
 
             foreach (LineStyle lineStyle in lineStyles)
             {

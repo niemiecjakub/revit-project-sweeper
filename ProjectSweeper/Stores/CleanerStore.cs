@@ -11,12 +11,13 @@ namespace ProjectSweeper.Stores
 {
     public class CleanerStore
     {
-        private readonly List<LineStyle> _lineStyles;
         private readonly Cleaner _cleaner;
         private Lazy<Task> _initializeLazy;
+        private readonly List<LineStyle> _lineStyles;
 
         public IEnumerable<LineStyle> LineStyles => _lineStyles;
-        public event Action<LineStyle> LineStyleDeleted;
+
+        public event Action<IEnumerable<LineStyle>> LineStyleDeleted;
 
         public CleanerStore(Cleaner cleaner)
         {
@@ -27,7 +28,7 @@ namespace ProjectSweeper.Stores
         private async Task Initialize()
         {
             Debug.WriteLine("Initializing lazy");
-            IEnumerable<LineStyle> lineStyles = _cleaner.GetAllLineStyles();
+            IEnumerable<LineStyle> lineStyles = await _cleaner.GetAllLineStyles();
             _lineStyles.Clear();
             _lineStyles.AddRange(lineStyles);
         }
@@ -45,16 +46,29 @@ namespace ProjectSweeper.Stores
             }
         }
 
-        public async Task DeleteLineStyle(LineStyle lineStyle)
+        public async Task DeleteLineStyle(IEnumerable<LineStyle> lineStyle)
         {
+            Debug.WriteLine("STORE: Inside store");
             await _cleaner.LineStyleDeleted(lineStyle);
-            _lineStyles.Remove(lineStyle);
-            Debug.WriteLine($"STORE: REMOVED {lineStyle.Name}");
 
-            OnLineStyleDeleted(lineStyle);
+            // Create a copy of the collection to avoid "collection was modified" error
+            List<LineStyle> lineStylesCopy = new List<LineStyle>(_lineStyles);
+
+            foreach (LineStyle ls in lineStyle)
+            {
+                lineStylesCopy.Remove(ls);
+            }
+
+            // Assign the updated collection back to _lineStyles
+            _lineStyles.Clear();
+            _lineStyles.AddRange(lineStylesCopy);
+
+            Debug.WriteLine($"STORE: Left {_lineStyles.Count} linestyles");
+
+            OnLineStyleDeleted(_lineStyles);
         }
 
-        private void OnLineStyleDeleted(LineStyle lineStyle)
+        private void OnLineStyleDeleted(IEnumerable<LineStyle> lineStyle)
         {
             LineStyleDeleted?.Invoke(lineStyle);
         }

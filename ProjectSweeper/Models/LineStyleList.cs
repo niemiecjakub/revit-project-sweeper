@@ -1,4 +1,5 @@
-﻿using ProjectSweeper.Services.ElementRemover;
+﻿using Autodesk.Revit.DB;
+using ProjectSweeper.Services.ElementRemover;
 using ProjectSweeper.Services.LineStyleProvider;
 using ProjectSweeper.ViewModels;
 using System;
@@ -20,15 +21,16 @@ namespace ProjectSweeper.Models
             _elementRemover = elementRemover;
         }
 
-        public IEnumerable<LineStyle> GetAllLineStyles()
+        public async Task<IEnumerable<LineStyle>> GetAllLineStyles()
         {
-            return _lineStyleProvider.GetAllElements();
+            return await _lineStyleProvider.GetAllElements();
         }
 
-        public async Task DeleteLineStyle(LineStyle lineStyle)
+        public async Task DeleteLineStyle(IEnumerable<LineStyle> lineStyle)
         {
-            Debug.WriteLine($"LINE STYLE LIST: {lineStyle.Name}");
-            await _elementRemover.Remove(lineStyle.Id);
+            Debug.WriteLine($"LINE STYLES LIST: inside line styles list"); ;
+            IEnumerable<ElementId> elementIds = lineStyle.Select(x => x.Id);
+            await _elementRemover.Remove(elementIds);
         }
     }
 }

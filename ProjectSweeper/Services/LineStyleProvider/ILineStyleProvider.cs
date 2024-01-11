@@ -9,6 +9,6 @@ namespace ProjectSweeper.Services.LineStyleProvider
 {
     public interface ILineStyleProvider
     {
-        IEnumerable<LineStyle> GetAllElements();
+        Task<IEnumerable<LineStyle>> GetAllElements();
     }
 }

@@ -31,8 +31,6 @@ namespace ProjectSweeper.ViewModels
             _cleanerStore.LinePatternDeleted += OnItemDeleted;
         }
 
-        
-
         public override void Dispose()
         {
             _cleanerStore.LinePatternDeleted -= OnItemDeleted;
@@ -46,7 +44,7 @@ namespace ProjectSweeper.ViewModels
             return viewModel;
         }
 
-        public void UpdateLinePatterns(IEnumerable<IElement> linePatterns)
+        public override void UpdateElements(IEnumerable<IElement> linePatterns)
         {
             _elements.Clear();
             ISet<IElement> unusedLinePatterns = linePatterns.Where(l => !l.IsUsed).ToHashSet();

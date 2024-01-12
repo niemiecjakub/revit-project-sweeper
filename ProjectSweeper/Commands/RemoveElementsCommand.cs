@@ -1,7 +1,9 @@
 ﻿using ProjectSweeper.Models;
 using ProjectSweeper.Stores;
+using ProjectSweeper.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -18,13 +20,20 @@ namespace ProjectSweeper.Commands
         {
             _cleanerStore = cleanerStore;
             _elementsToBeDeleted = elementsToBeDeleted;
+
         }
 
         public override void Execute(object parameter)
         {
             IEnumerable<IElement> elementsToBeDeleted = _elementsToBeDeleted.Where(x => !x.IsUsed && x.CanBeRemoved);
             Debug.WriteLine($"Got {elementsToBeDeleted.Count()} to be deleted");
-            _cleanerStore.DeleteElemenets(elementsToBeDeleted);
+            _cleanerStore.DeleteElements(elementsToBeDeleted);
+            OnCanExecuteChanged();
+        }
+
+        public override bool CanExecute(object parameter)
+        {
+            return _elementsToBeDeleted.Where(x => !x.IsUsed && x.CanBeRemoved).Count() > 0;
         }
     }
 }

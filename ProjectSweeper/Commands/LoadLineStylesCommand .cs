@@ -27,7 +27,7 @@ namespace ProjectSweeper.Commands
             {
                 Debug.WriteLine("Load line style command");
                 await _cleanerStore.Load();
-                _lineStyleManagerViewModel.UpdateLineStyles(_cleanerStore.LineStyles);
+                _lineStyleManagerViewModel.UpdateElements(_cleanerStore.LineStyles);
             }
             catch (Exception)
             {

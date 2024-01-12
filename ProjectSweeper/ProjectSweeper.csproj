@@ -103,7 +103,8 @@
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Stores\CleanerStore.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
-    <Compile Include="ViewModels\AbstractManagerViewModel.cs" />
+    <Compile Include="ViewModels\IElementManager.cs" />
+    <Compile Include="ViewModels\ManagerViewModelBase.cs" />
     <Compile Include="ViewModels\IElementViewModel.cs" />
     <Compile Include="ViewModels\LayoutViewModel.cs" />
     <Compile Include="ViewModels\LinePatternManagerViewModel.cs" />

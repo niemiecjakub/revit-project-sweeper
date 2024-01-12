@@ -28,7 +28,7 @@ namespace ProjectSweeper.Commands
             {
                 Debug.WriteLine("Load line PATTERN command");
                 await _cleanerStore.Load();
-                _linePatternManagerViewModel.UpdateLinePatterns(_cleanerStore.LinePatterns);
+                _linePatternManagerViewModel.UpdateElements(_cleanerStore.LinePatterns);
             }
             catch (Exception)
             {

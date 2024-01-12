@@ -22,7 +22,6 @@ namespace ProjectSweeper.Stores
         public event Action<IEnumerable<IElement>> LineStyleDeleted;
         public event Action<IEnumerable<IElement>> LinePatternDeleted;
 
-        public event Action<IEnumerable<IElement>> ElementDeleted;
 
         public CleanerStore(Cleaner cleaner)
         {
@@ -41,7 +40,6 @@ namespace ProjectSweeper.Stores
             IEnumerable<IElement> linePatterns = await _cleaner.GetAllLinePatterns();
             _linePatterns.Clear();
             _linePatterns.AddRange(linePatterns);
-
         }
 
         public async Task Load()
@@ -59,61 +57,47 @@ namespace ProjectSweeper.Stores
 
 
 
-        public void DeleteElemenets(IEnumerable<IElement> elements)
+        public void DeleteElements(IEnumerable<IElement> elements)
         {
             Debug.WriteLine("STORE: Inside store");
-            IEnumerable<ModelTypes> modelTypes = elements.Select(e => e.ModelType);
-            bool allSameModelType = modelTypes.All(mt => mt.Equals(modelTypes.First()));
-            if (!allSameModelType)
-            {
-                Debug.WriteLine("Elements are not the same model type");
-                return;
-            }
 
-            ModelTypes modelType = modelTypes.First();
+            ModelTypes modelType = elements.First().ModelType;
+            List<IElement> collection;
+            Action<IEnumerable<IElement>> eventAction;
+
             switch (modelType)
             {
                 case ModelTypes.LinePattern:
-                    _cleaner.LineStyleDeleted(elements);
-
-                    List<IElement> linePatternsCopy = new List<IElement>(_linePatterns);
-
-                    foreach (IElement lp in elements)
-                    {
-                        linePatternsCopy.Remove(lp);
-                    }
-
-                    // Assign the updated collection back to _lineStyles
-                    _linePatterns.Clear();
-                    _linePatterns.AddRange(linePatternsCopy);
-
-                    Debug.WriteLine($"STORE: Left {_linePatterns.Count} linepatterns");
-
-                    OnLinePatternDeleted(_linePatterns);
-
+                    collection = _linePatterns;
+                    eventAction = OnLinePatternDeleted;
+                    _cleaner.LinePatternDeleted(elements);
                     break;
-
 
                 case ModelTypes.LineStyle:
-                    _cleaner.LinePatternDeleted(elements);
-
-                    List<IElement> lineStylesCopy = new List<IElement>(_lineStyles);
-
-                    foreach (IElement ls in elements)
-                    {
-                        lineStylesCopy.Remove(ls);
-                    }
-
-                    // Assign the updated collection back to _lineStyles
-                    _lineStyles.Clear();
-                    _lineStyles.AddRange(lineStylesCopy);
-
-                    Debug.WriteLine($"STORE: Left {_lineStyles.Count} linestyles");
-
-                    OnLineStyleDeleted(_lineStyles);
-
+                    collection = _lineStyles;
+                    eventAction = OnLineStyleDeleted;
+                    _cleaner.LineStyleDeleted(elements);
                     break;
+
+                default:
+                    Debug.WriteLine("Elements are not the same model type");
+                    return;
             }
+
+            List<IElement> collectionCopy = new List<IElement>(collection);
+
+            foreach (IElement element in elements)
+            {
+                collectionCopy.Remove(element);
+            }
+
+            // Assign the updated collection back
+            collection.Clear();
+            collection.AddRange(collectionCopy);
+
+            Debug.WriteLine($"STORE: Left {collection.Count} {modelType}s");
+
+            eventAction?.Invoke(collection);
         }
 
 

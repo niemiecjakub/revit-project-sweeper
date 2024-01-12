@@ -40,7 +40,7 @@ namespace ProjectSweeper.ViewModels
             return viewModel;
         }
 
-        public void UpdateLineStyles(IEnumerable<IElement> lineStyles)
+        public override void UpdateElements(IEnumerable<IElement> lineStyles)
         {
             _elements.Clear();
             ISet<IElement> unusedItems = lineStyles.Where(l => !l.IsUsed).ToHashSet();

@@ -15,6 +15,8 @@ namespace ProjectSweeper.ViewModels
         where ViewModel : IElementViewModel
     {
         public string Name { get; }
+        public bool CanRemoveElements => _elements.Where(e => !e.IsUsed && e.CanBeRemoved).Count() > 0;
+
         protected ObservableCollection<ViewModel> _elements;
         public ObservableCollection<ViewModel> Elements
         {
@@ -23,6 +25,7 @@ namespace ProjectSweeper.ViewModels
             {
                 _elements = value;
                 OnPropertyChanged(nameof(Elements));
+                OnPropertyChanged(nameof(CanRemoveElements));
             }
         }
 
@@ -38,10 +41,10 @@ namespace ProjectSweeper.ViewModels
             }
         }
 
+        
         public ManagerViewModelBase()
         {
             _elements = new ObservableCollection<ViewModel>();
-            
         }
 
         public void OnItemDeleted(IEnumerable<IElement> itemsToBeLeft)
@@ -57,6 +60,9 @@ namespace ProjectSweeper.ViewModels
             }
             _elements = itemsToBeLeftCollection;
             OnPropertyChanged(nameof(Elements));
+            OnPropertyChanged(nameof(CanRemoveElements));
         }
+
+        public abstract void UpdateElements(IEnumerable<IElement> elements);
     }
 }

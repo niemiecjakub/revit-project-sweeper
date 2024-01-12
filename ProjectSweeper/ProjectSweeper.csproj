@@ -71,7 +71,7 @@
     <Compile Include="App.cs" />
     <Compile Include="Commands\AsyncCommandBase.cs" />
     <Compile Include="Commands\CommandBase .cs" />
-    <Compile Include="Commands\GeneralRemoveCommand.cs" />
+    <Compile Include="Commands\RemoveElementsCommand.cs" />
     <Compile Include="Commands\LoadLinePatternsCommand.cs" />
     <Compile Include="Commands\LoadLineStylesCommand .cs" />
     <Compile Include="Commands\NavigateCommand.cs" />
@@ -103,6 +103,8 @@
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Stores\CleanerStore.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
+    <Compile Include="ViewModels\AbstractManagerViewModel.cs" />
+    <Compile Include="ViewModels\IElementViewModel.cs" />
     <Compile Include="ViewModels\LayoutViewModel.cs" />
     <Compile Include="ViewModels\LinePatternManagerViewModel.cs" />
     <Compile Include="ViewModels\LinePatternViewModel.cs" />

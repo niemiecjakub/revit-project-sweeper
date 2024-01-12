@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Commands
 {
-    public class GeneralRemoveCommand : CommandBase
+    public class RemoveElementsCommand : CommandBase
     {
         private readonly CleanerStore _cleanerStore;
         private readonly IEnumerable<IElement> _elementsToBeDeleted;
 
-        public GeneralRemoveCommand(CleanerStore cleanerStore, IEnumerable<IElement> elementsToBeDeleted)
+        public RemoveElementsCommand(CleanerStore cleanerStore, IEnumerable<IElement> elementsToBeDeleted)
         {
             _cleanerStore = cleanerStore;
             _elementsToBeDeleted = elementsToBeDeleted;

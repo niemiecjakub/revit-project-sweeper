@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.ViewModels
 {
-    public class LinePatternViewModel : ViewModelBase
+    public class LinePatternViewModel : ViewModelBase, IElementViewModel
     {
         private readonly LinePatternModel _linePattern;
+        public LinePatternModel Model => _linePattern;
         public ElementId Id => _linePattern.Id;
         public bool IsUsed => _linePattern.IsUsed;
         public string Name => _linePattern.Name;

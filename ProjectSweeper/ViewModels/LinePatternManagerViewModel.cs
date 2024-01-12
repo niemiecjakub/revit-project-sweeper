@@ -1,4 +1,5 @@
-﻿using ProjectSweeper.Commands;
+﻿using Autodesk.Revit.DB;
+using ProjectSweeper.Commands;
 using ProjectSweeper.Models;
 using ProjectSweeper.Stores;
 using System;
@@ -9,64 +10,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace ProjectSweeper.ViewModels
 {
-    public class LinePatternManagerViewModel : ViewModelBase
+    public class LinePatternManagerViewModel : ManagerViewModelBase<LinePatternModel, LinePatternViewModel>
     {
         public string Name => "Line pattern manager";
-        private readonly CleanerStore _cleanerStore;
-
-        private ObservableCollection<LinePatternViewModel> _linePatterns;
-        public ObservableCollection<LinePatternViewModel> LinePatterns => _linePatterns;
-
-        private bool _isLoading;
-
-        public bool IsLoading
-        {
-            get { return _isLoading; }
-            set
-            {
-                _isLoading = value;
-                OnPropertyChanged(nameof(IsLoading));
-            }
-        }
+        protected readonly CleanerStore _cleanerStore;
 
         public ICommand LoadLinePatternsCommand { get; }
         public ICommand RemoveLinePatternsCommand { get; }
-        public LinePatternManagerViewModel(CleanerStore cleanerStore)
+
+        public LinePatternManagerViewModel(CleanerStore cleanerStore) : base()
         {
-            Debug.WriteLine("new line style");
-
             _cleanerStore = cleanerStore;
-            _linePatterns = new ObservableCollection<LinePatternViewModel>();
 
-            LoadLinePatternsCommand = new LoadLinePatternsCommand(this, cleanerStore);
-            RemoveLinePatternsCommand = new GeneralRemoveCommand(cleanerStore, _cleanerStore.LinePatterns);
-
-            
-            _cleanerStore.LinePatternDeleted += OnLinePatternsDeleted;
+            LoadLinePatternsCommand = new LoadLinePatternsCommand(this, _cleanerStore);
+            RemoveLinePatternsCommand = new RemoveElementsCommand(cleanerStore, _cleanerStore.LinePatterns);
+            _cleanerStore.LinePatternDeleted += OnItemDeleted;
         }
+
+        
 
         public override void Dispose()
         {
-            _cleanerStore.LinePatternDeleted -= OnLinePatternsDeleted;
+            _cleanerStore.LinePatternDeleted -= OnItemDeleted;
             base.Dispose();
-        }
-
-        private void OnLinePatternsDeleted(IEnumerable<IElement> linePatternsToBeLeft)
-        {
-            ObservableCollection<LinePatternViewModel> lpToBeLeft = new ObservableCollection<LinePatternViewModel>();
-            foreach (IElement style in linePatternsToBeLeft.ToList())
-            {
-                LinePatternViewModel linePatternViewModel = _linePatterns.FirstOrDefault(lp => lp.Id == style.Id);
-                if (linePatternViewModel != null)
-                {
-                    lpToBeLeft.Add(linePatternViewModel);
-                }
-            }
-            _linePatterns = lpToBeLeft;
-            OnPropertyChanged(nameof(LinePatterns));
         }
 
         public static LinePatternManagerViewModel LoadViewModel(CleanerStore cleanerStore)
@@ -78,7 +48,7 @@ namespace ProjectSweeper.ViewModels
 
         public void UpdateLinePatterns(IEnumerable<IElement> linePatterns)
         {
-            _linePatterns.Clear();
+            _elements.Clear();
             ISet<IElement> unusedLinePatterns = linePatterns.Where(l => !l.IsUsed).ToHashSet();
             ISet<IElement> unusedLinePatternsToBeRemoved = unusedLinePatterns.Where(l => l.CanBeRemoved).ToHashSet();
             Debug.WriteLine($"{linePatterns.Count()} -  Line Patterns found - {unusedLinePatterns.Count} Unused - out of which {unusedLinePatternsToBeRemoved.Count} can be removed");
@@ -87,7 +57,7 @@ namespace ProjectSweeper.ViewModels
             {
                 LinePatternModel linePatternModel = new LinePatternModel(linePattern.Name, linePattern.Id);
                 LinePatternViewModel linePatternViewModel = new LinePatternViewModel(linePatternModel);
-                _linePatterns.Add(linePatternViewModel);
+                _elements.Add(linePatternViewModel);
             }
         }
     }

@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.ViewModels
 {
-    public class LineStyleViewModel : ViewModelBase
+    public class LineStyleViewModel : ViewModelBase, IElementViewModel
     {
-        private readonly LineStyleModel _lineStyle;
+        private LineStyleModel _lineStyle;
+        public LineStyleModel Model => _lineStyle;
         public ElementId Id => _lineStyle.Id;
         public bool IsUsed => _lineStyle.IsUsed;
         public string Name => _lineStyle.Name;

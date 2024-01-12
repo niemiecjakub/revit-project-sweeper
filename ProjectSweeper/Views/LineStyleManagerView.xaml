@@ -22,7 +22,7 @@
 
         <TextBlock Grid.Row="0" Text="{Binding Name}"/>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding LineStyles}">
+        <ListView Grid.Row="1" ItemsSource="{Binding Elements}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" Foreground="{Binding IsUsed, Converter={StaticResource IsUsedToColorConverter}}" />

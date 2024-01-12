@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Commands
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public abstract class AsyncCommandBase : CommandBase
     {
         private bool _isExecuting;

@@ -20,7 +20,7 @@ namespace ProjectSweeper.Services.FillPatternProvider
         }
         public async Task<IEnumerable<IElement>> GetAllElements()
         {
-            Debug.WriteLine("Getting all linePatterns in provider");
+            Debug.WriteLine("Getting all FILL PATETRNS in provider");
             IEnumerable<IElement> linePatterns = FillPatternFunctions.GetAllFillPatterns(_doc);
             return linePatterns;
         }

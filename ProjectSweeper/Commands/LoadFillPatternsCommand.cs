@@ -27,7 +27,7 @@ namespace ProjectSweeper.Commands
             try
             {
                 Debug.WriteLine("Load Fill Patetrns command");
-                await _cleanerStore.Load();
+                await _cleanerStore.LoadFillPatterns();
                 _fillPatternManagerViewModel.UpdateElements(_cleanerStore.FillPatterns);
             }
             catch (Exception)

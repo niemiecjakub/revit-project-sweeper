@@ -21,7 +21,7 @@ namespace ProjectSweeper.Services.LineStyleProvider
 
         public async Task<IEnumerable<IElement>> GetAllElements()
         {
-            Debug.WriteLine("Getting all linestyles in provider");
+            Debug.WriteLine("Getting all LINE STYLES in provider");
             IEnumerable<IElement> lineStyles = LineFunctions.GetLineStyles(_doc);
 
             foreach (IElement lineStyle in lineStyles)

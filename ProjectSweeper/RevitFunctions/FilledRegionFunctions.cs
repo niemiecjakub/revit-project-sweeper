@@ -17,12 +17,13 @@ namespace ProjectSweeper.RevitFunctions
         {
             ISet<FilledRegionModel> filledRegionsList = new HashSet<FilledRegionModel>();
 
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            ISet<FilledRegionType> filledRegions = collector.OfClass(typeof(FilledRegionType)).Cast<FilledRegionType>().ToHashSet();
+            FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(FilledRegionType));
+            IEnumerable<FilledRegionType> filledRegions = collector.Cast<FilledRegionType>().ToHashSet();
 
             foreach (FilledRegionType filledRegion in filledRegions)
             {
                 FilledRegionModel filledRegionModel = new FilledRegionModel(filledRegion);
+                filledRegionModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, filledRegion.Id);
                 filledRegionsList.Add(filledRegionModel);
             }
 
@@ -45,10 +46,10 @@ namespace ProjectSweeper.RevitFunctions
                     FilledRegion filledRegionElement = element as FilledRegion;
                     ElementId filledRegionTypeId = filledRegionElement.GetTypeId();
                     FilledRegionType filledRegionType = doc.GetElement(filledRegionTypeId) as FilledRegionType;
-                    FilledRegionModel filledRegionModel = filledRegions.Where(fr => fr.Id == filledRegionType.Id).First();
+                    if (filledRegionType == null) { continue; }
+                    FilledRegionModel filledRegionModel = filledRegions.Where(fr => fr.Id == filledRegionType.Id).FirstOrDefault();
 
                     if (filledRegionModel == null) { continue; }
-
                     filledRegionModel.IsUsed = true;
 
                 }

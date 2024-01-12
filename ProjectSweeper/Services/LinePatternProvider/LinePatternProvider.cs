@@ -20,7 +20,7 @@ namespace ProjectSweeper.Services.LinePatternProvider
         }
         public async Task<IEnumerable<IElement>> GetAllElements()
         {
-            Debug.WriteLine("Getting all linePatterns in provider");
+            Debug.WriteLine("Getting all LINE PATETRNS in provider");
             IEnumerable<IElement> linePatterns = LineFunctions.GetLinePatterns(_doc);
             return linePatterns;
         }

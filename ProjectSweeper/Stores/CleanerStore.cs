@@ -12,7 +12,12 @@ namespace ProjectSweeper.Stores
     public class CleanerStore
     {
         private readonly Cleaner _cleaner;
-        private Lazy<Task> _initializeLazy;
+
+        private Lazy<Task> _initializeLazyLineStyles;
+        private Lazy<Task> _initializeLazyLinePatterns;
+        private Lazy<Task> _initializeLazyFilledRegions;
+        private Lazy<Task> _initializeLazyFillPatterns;
+
         private readonly List<IElement> _lineStyles;
         private readonly List<IElement> _linePatterns;
         private readonly List<IElement> _filledRegions;
@@ -31,42 +36,91 @@ namespace ProjectSweeper.Stores
         public CleanerStore(Cleaner cleaner)
         {
             _cleaner = cleaner;
-            _initializeLazy = new Lazy<Task>(Initialize);
+            _initializeLazyLineStyles = new Lazy<Task>(InitializeLineStyles);
+            _initializeLazyLinePatterns = new Lazy<Task>(InitializeLinePatterns);
+            _initializeLazyFilledRegions = new Lazy<Task>(InitializeFilledRegions);
+            _initializeLazyFillPatterns = new Lazy<Task>(InitializeFillPatterns);
+
             _lineStyles = new List<IElement>();
             _linePatterns = new List<IElement>();
             _filledRegions = new List<IElement>();
             _fillPatterns = new List<IElement>();
         }
-        private async Task Initialize()
+        private async Task InitializeLineStyles()
         {
-            Debug.WriteLine("Initializing lazy");
+            Debug.WriteLine("Initializing lazy line styles");
             IEnumerable<IElement> lineStyles = await _cleaner.GetAllLineStyles();
             _lineStyles.Clear();
             _lineStyles.AddRange(lineStyles);
-
+        }
+        private async Task InitializeLinePatterns()
+        {
+            Debug.WriteLine("Initializing lazy line patterns");
             IEnumerable<IElement> linePatterns = await _cleaner.GetAllLinePatterns();
             _linePatterns.Clear();
             _linePatterns.AddRange(linePatterns);
-
+        }
+        private async Task InitializeFilledRegions()
+        {
+            Debug.WriteLine("Initializing lazy Filled Regions");
             IEnumerable<IElement> filledRegions = await _cleaner.GetAllFilledRegions();
             _filledRegions.Clear();
             _filledRegions.AddRange(filledRegions);
-
+        }
+        private async Task InitializeFillPatterns()
+        {
+            Debug.WriteLine("Initializing lazy Fill Patterns");
             IEnumerable<IElement> fillPatterns = await _cleaner.GetAllFillPatterns();
             _fillPatterns.Clear();
             _fillPatterns.AddRange(fillPatterns);
         }
 
-        public async Task Load()
+        public async Task LoadLineStyles()
         {
             Debug.WriteLine("Loading");
             try
             {
-                await _initializeLazy.Value;
+                await _initializeLazyLineStyles.Value;
             }
             catch (Exception)
             {
-                _initializeLazy = new Lazy<Task>(Initialize);
+                _initializeLazyLineStyles = new Lazy<Task>(InitializeLineStyles);
+            }
+        }
+        public async Task LoadLinePatterns()
+        {
+            Debug.WriteLine("Loading");
+            try
+            {
+                await _initializeLazyLinePatterns.Value;
+            }
+            catch (Exception)
+            {
+                _initializeLazyLinePatterns = new Lazy<Task>(InitializeLinePatterns);
+            }
+        }
+        public async Task LoadFilledRegions()
+        {
+            Debug.WriteLine("Loading");
+            try
+            {
+                await _initializeLazyFilledRegions.Value;
+            }
+            catch (Exception)
+            {
+                _initializeLazyFilledRegions = new Lazy<Task>(InitializeFilledRegions);
+            }
+        }
+        public async Task LoadFillPatterns()
+        {
+            Debug.WriteLine("Loading");
+            try
+            {
+                await _initializeLazyFillPatterns.Value;
+            }
+            catch (Exception)
+            {
+                _initializeLazyFillPatterns = new Lazy<Task>(InitializeFillPatterns);
             }
         }
 

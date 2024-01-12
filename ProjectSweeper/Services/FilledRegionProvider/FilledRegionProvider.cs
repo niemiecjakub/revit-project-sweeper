@@ -20,7 +20,7 @@ namespace ProjectSweeper.Services.FilledRegionProvider
         }
         public async Task<IEnumerable<IElement>> GetAllElements()
         {
-            Debug.WriteLine("Getting all filled regions in provider");
+            Debug.WriteLine("Getting all FILLED REGIONS in provider");
             IEnumerable<IElement> linePatterns = FilledRegionFunctions.GetAllFilledRegions(_doc);
             return linePatterns;
         }

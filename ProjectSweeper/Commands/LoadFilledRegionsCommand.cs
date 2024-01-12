@@ -27,7 +27,7 @@ namespace ProjectSweeper.Commands
             try
             {
                 Debug.WriteLine("Load FILLED REGIONS command");
-                await _cleanerStore.Load();
+                await _cleanerStore.LoadFilledRegions();
                 _filledRegionManagerViewModel.UpdateElements(_cleanerStore.FiilledRegions);
             }
             catch (Exception)

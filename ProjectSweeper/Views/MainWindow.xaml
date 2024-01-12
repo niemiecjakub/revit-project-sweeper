@@ -21,6 +21,12 @@
             <DataTemplate DataType="{x:Type vms:LineStyleManagerViewModel}">
                 <view:LineStyleManagerView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type vms:FillPatternManagerViewModel}">
+                <view:FillPatternManagerView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vms:FilledRegionManagerViewModel}">
+                <view:FilledRegionManagerView />
+            </DataTemplate>
         </Grid.Resources>
 
         <ContentControl Content="{Binding CurrentViewModel}" />

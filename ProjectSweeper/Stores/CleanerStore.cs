@@ -15,13 +15,18 @@ namespace ProjectSweeper.Stores
         private Lazy<Task> _initializeLazy;
         private readonly List<IElement> _lineStyles;
         private readonly List<IElement> _linePatterns;
+        private readonly List<IElement> _filledRegions;
+        private readonly List<IElement> _fillPatterns;
 
         public IEnumerable<IElement> LineStyles => _lineStyles;
         public IEnumerable<IElement> LinePatterns => _linePatterns;
+        public IEnumerable<IElement> FiilledRegions => _filledRegions;
+        public IEnumerable<IElement> FillPatterns => _fillPatterns;
 
         public event Action<IEnumerable<IElement>> LineStyleDeleted;
         public event Action<IEnumerable<IElement>> LinePatternDeleted;
-
+        public event Action<IEnumerable<IElement>> FilledRegionDeleted;
+        public event Action<IEnumerable<IElement>> FillPatternDeleted;
 
         public CleanerStore(Cleaner cleaner)
         {
@@ -29,6 +34,8 @@ namespace ProjectSweeper.Stores
             _initializeLazy = new Lazy<Task>(Initialize);
             _lineStyles = new List<IElement>();
             _linePatterns = new List<IElement>();
+            _filledRegions = new List<IElement>();
+            _fillPatterns = new List<IElement>();
         }
         private async Task Initialize()
         {
@@ -40,6 +47,14 @@ namespace ProjectSweeper.Stores
             IEnumerable<IElement> linePatterns = await _cleaner.GetAllLinePatterns();
             _linePatterns.Clear();
             _linePatterns.AddRange(linePatterns);
+
+            IEnumerable<IElement> filledRegions = await _cleaner.GetAllFilledRegions();
+            _filledRegions.Clear();
+            _filledRegions.AddRange(filledRegions);
+
+            IEnumerable<IElement> fillPatterns = await _cleaner.GetAllFillPatterns();
+            _fillPatterns.Clear();
+            _fillPatterns.AddRange(fillPatterns);
         }
 
         public async Task Load()
@@ -54,8 +69,6 @@ namespace ProjectSweeper.Stores
                 _initializeLazy = new Lazy<Task>(Initialize);
             }
         }
-
-
 
         public void DeleteElements(IEnumerable<IElement> elements)
         {

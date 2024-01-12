@@ -9,6 +9,8 @@ namespace ProjectSweeper.Models
     public enum ModelTypes
     {
         LineStyle,
-        LinePattern
+        LinePattern,
+        FilledRegion,
+        FillPattern
     }
 }

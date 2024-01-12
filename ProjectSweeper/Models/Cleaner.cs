@@ -11,11 +11,16 @@ namespace ProjectSweeper.Models
     {
         private readonly LineStyleModelList _lineStyleList;
         private readonly LinePatternModelList _linePatternList;
+        private readonly FilledRegionModelList _filledRegionList;
+        private readonly FillPatternModelList _fillPatternList;
 
-        public Cleaner(LineStyleModelList lineStyleList, LinePatternModelList linePatternList)
+
+        public Cleaner(LineStyleModelList lineStyleList, LinePatternModelList linePatternList, FilledRegionModelList filledRegionList, FillPatternModelList fillPatternList)
         {
             _lineStyleList = lineStyleList;
             _linePatternList = linePatternList;
+            _filledRegionList = filledRegionList;
+            _fillPatternList = fillPatternList;
         }
 
 
@@ -43,6 +48,26 @@ namespace ProjectSweeper.Models
         {
             Debug.WriteLine("CLEANER: Inside cleaner");
             _linePatternList.DeleteLinePatetrn(linePatterns);
+        }
+
+        public async Task<IEnumerable<IElement>> GetAllFilledRegions()
+        {
+            return await _filledRegionList.GetAllFilledRegions();
+        }
+        public void FilledRegionDeleted(IEnumerable<IElement> filledRegions)
+        {
+            Debug.WriteLine("CLEANER: Inside cleaner");
+            _filledRegionList.DeleteFilledRegion(filledRegions);
+        }
+
+        public async Task<IEnumerable<IElement>> GetAllFillPatterns()
+        {
+            return await _fillPatternList.GetAllFillPatterns();
+        }
+        public void FillPatternDeleted(IEnumerable<IElement> fillPatterns)
+        {
+            Debug.WriteLine("CLEANER: Inside cleaner");
+            _fillPatternList.DeleteFillPattern(fillPatterns);
         }
 
     }

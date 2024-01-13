@@ -11,6 +11,7 @@ namespace ProjectSweeper.Models
         LineStyle,
         LinePattern,
         FilledRegion,
-        FillPattern
+        FillPattern,
+        Text
     }
 }

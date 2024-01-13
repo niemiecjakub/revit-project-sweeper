@@ -11,6 +11,7 @@
     <AssemblyName>ProjectSweeper</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>9.0</LangVersion>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -95,11 +96,13 @@
     <Compile Include="Models\LineStyleModel.cs" />
     <Compile Include="Models\LineStyleModelList.cs" />
     <Compile Include="Models\ModelTypes.cs" />
+    <Compile Include="Models\TextTypeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RevitFunctions\DocumentFunctions.cs" />
     <Compile Include="RevitFunctions\FilledRegionFunctions.cs" />
     <Compile Include="RevitFunctions\FillPatternFunctions.cs" />
     <Compile Include="RevitFunctions\LineFunctions.cs" />
+    <Compile Include="RevitFunctions\TextFunctions.cs" />
     <Compile Include="Services\ElementRemover\ElementRemover.cs" />
     <Compile Include="Services\ElementRemover\IElementRemover.cs" />
     <Compile Include="Services\FilledRegionProvider\FilledRegionProvider.cs" />
@@ -113,6 +116,8 @@
     <Compile Include="Services\LineStyleProvider\ILineStyleProvider.cs" />
     <Compile Include="Services\LineStyleProvider\LineStyleProvider.cs" />
     <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="Services\TextTypeProvider\ITextTypeProvider.cs" />
+    <Compile Include="Services\TextTypeProvider\TextTypeProvider.cs" />
     <Compile Include="Stores\CleanerStore.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
     <Compile Include="ViewModels\FilledRegionManagerViewModel.cs" />

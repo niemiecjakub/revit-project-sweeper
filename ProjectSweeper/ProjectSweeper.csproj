@@ -72,11 +72,8 @@
     <Compile Include="App.cs" />
     <Compile Include="Commands\AsyncCommandBase.cs" />
     <Compile Include="Commands\CommandBase .cs" />
-    <Compile Include="Commands\LoadFilledRegionsCommand.cs" />
-    <Compile Include="Commands\LoadFillPatternsCommand.cs" />
+    <Compile Include="Commands\LoadElementsCommand.cs" />
     <Compile Include="Commands\RemoveElementsCommand.cs" />
-    <Compile Include="Commands\LoadLinePatternsCommand.cs" />
-    <Compile Include="Commands\LoadLineStylesCommand .cs" />
     <Compile Include="Commands\NavigateCommand.cs" />
     <Compile Include="Components\Layout.xaml.cs">
       <DependentUpon>Layout.xaml</DependentUpon>
@@ -92,6 +89,7 @@
     <Compile Include="Models\FillPatternModelList.cs" />
     <Compile Include="Models\FilterModel.cs" />
     <Compile Include="Models\IElement.cs" />
+    <Compile Include="Models\IModelList.cs" />
     <Compile Include="Models\LinePatternModel.cs" />
     <Compile Include="Models\LinePatternModelList.cs" />
     <Compile Include="Models\LineStyleModel.cs" />
@@ -122,41 +120,27 @@
     <Compile Include="Services\LineStyleProvider\ILineStyleProvider.cs" />
     <Compile Include="Services\LineStyleProvider\LineStyleProvider.cs" />
     <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="Services\ParameterNavigationService.cs" />
     <Compile Include="Services\TextTypeProvider\ITextTypeProvider.cs" />
     <Compile Include="Services\TextTypeProvider\TextTypeProvider.cs" />
     <Compile Include="Services\ViewportProvider\IViewportProvider.cs" />
     <Compile Include="Services\ViewportProvider\ViewportProvider.cs" />
     <Compile Include="Stores\CleanerStore.cs" />
     <Compile Include="Stores\NavigationStore.cs" />
-    <Compile Include="ViewModels\FilledRegionManagerViewModel.cs" />
-    <Compile Include="ViewModels\FilledRegionViewModel.cs" />
-    <Compile Include="ViewModels\FillPatternManagerViewModel.cs" />
-    <Compile Include="ViewModels\FillPatternViewModel.cs" />
-    <Compile Include="ViewModels\IElementManager.cs" />
-    <Compile Include="ViewModels\ManagerViewModelBase.cs" />
+    <Compile Include="ViewModels\ElementViewModel.cs" />
     <Compile Include="ViewModels\IElementViewModel.cs" />
     <Compile Include="ViewModels\LayoutViewModel.cs" />
-    <Compile Include="ViewModels\LinePatternManagerViewModel.cs" />
-    <Compile Include="ViewModels\LinePatternViewModel.cs" />
-    <Compile Include="ViewModels\LineStyleManagerViewModel.cs" />
-    <Compile Include="ViewModels\LineStyleViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\MasterManagerViewModel.cs" />
     <Compile Include="ViewModels\NavigationBarViewModel.cs" />
+    <Compile Include="ViewModels\SweeperViewFactory\IManagerViewModelFactory.cs" />
+    <Compile Include="ViewModels\SweeperViewFactory\ManagerViewModelFactory.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="Views\FilledRegionManagerView.xaml.cs">
-      <DependentUpon>FilledRegionManagerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\FillPatternManagerView.xaml.cs">
-      <DependentUpon>FillPatternManagerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\LinePatternManagerView.xaml.cs">
-      <DependentUpon>LinePatternManagerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\LineStyleManagerView.xaml.cs">
-      <DependentUpon>LineStyleManagerView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MasterView.xaml.cs">
+      <DependentUpon>MasterView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -168,23 +152,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\FilledRegionManagerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\FillPatternManagerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\LinePatternManagerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\LineStyleManagerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MasterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,7 @@
-﻿using ProjectSweeper.Commands;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ProjectSweeper.Commands;
 using ProjectSweeper.Services;
+using ProjectSweeper.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +13,17 @@ namespace ProjectSweeper.ViewModels
 {
     public class NavigationBarViewModel : ViewModelBase
     {
-        public ICommand NavigateLineStyleCommand { get; }
-        public ICommand NavigateLinePatternCommand { get; }
-        public ICommand NavigateFilledRegionComamnd { get; }
-        public ICommand NavigateFillPatternCommand { get; }
+        public ICommand lineStyleNavigaitonCommand { get; }
+        public ICommand linePatternNavigationCommand { get; }
+        public ICommand FilledRegionNavigationComand { get; }
+        public ICommand FillPatternNavigationCommand { get; }
 
-
-        public NavigationBarViewModel(INavigationService lineStyleNavigationService, INavigationService linePatternNavigationService, INavigationService filledRegionNavigationService, INavigationService fillPatternNavigationService)
+        public NavigationBarViewModel(INavigationService lineStyleNavigation, INavigationService linePatternNavigation, INavigationService filledRegionNavigation, INavigationService fillPatternNavigation)
         {
-            NavigateLineStyleCommand = new NavigateCommand(lineStyleNavigationService);
-            NavigateLinePatternCommand = new NavigateCommand(linePatternNavigationService);
-            NavigateFilledRegionComamnd = new NavigateCommand(filledRegionNavigationService);
-            NavigateFillPatternCommand = new NavigateCommand(fillPatternNavigationService);
+            lineStyleNavigaitonCommand = new NavigateCommand(lineStyleNavigation);
+            linePatternNavigationCommand = new NavigateCommand(linePatternNavigation);
+            FilledRegionNavigationComand = new NavigateCommand(filledRegionNavigation);
+            FillPatternNavigationCommand = new NavigateCommand(fillPatternNavigation);
         }
     }
 }

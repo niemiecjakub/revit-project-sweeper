@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ProjectSweeper.Views
 {
     /// <summary>
-    /// Interaction logic for LinePatternView.xaml
+    /// Interaction logic for MasterView.xaml
     /// </summary>
-    public partial class LinePatternManagerView : UserControl
+    public partial class MasterView : UserControl
     {
-        public LinePatternManagerView()
+        public MasterView()
         {
             InitializeComponent();
         }

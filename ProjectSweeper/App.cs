@@ -42,7 +42,7 @@ namespace ProjectSweeper
             services.AddSingleton<NavigationStore>();
 
             //NAVIGATION SERVICE
-            services.AddSingleton<INavigationService>(s => CreateLineStyleNavigationService(s));
+            services.AddSingleton<INavigationService>(s => CreateLineStyleNavigation(s));
 
             //WINDOWS
             services.AddSingleton<MainWindow>(s => new MainWindow()
@@ -59,10 +59,7 @@ namespace ProjectSweeper
 
             //VIEW MODELS
             services.AddTransient<NavigationBarViewModel>(CreateNavigationBarViewModel);
-            services.AddTransient<LineStyleManagerViewModel>(s => CreateLineStyleManagerViewModel(s));
-            services.AddTransient<LinePatternManagerViewModel>(s => CreateLinePatternManagerViewModel(s));
-            services.AddTransient<FilledRegionManagerViewModel>(s => CreateFilledRegionManagerViewModel(s));
-            services.AddTransient<FillPatternManagerViewModel>(s => CreateFillPatternManagerViewModel(s));
+            services.AddTransient<MasterManagerViewModel>(s => CreateLineStyleManagerViewModel(s));
 
             services.AddSingleton<MainViewModel>();
 
@@ -71,70 +68,63 @@ namespace ProjectSweeper
 
         private Cleaner CreateCleaner(IServiceProvider serviceProvider)
         {
-            return new Cleaner(serviceProvider.GetRequiredService<LineStyleModelList>(), serviceProvider.GetRequiredService<LinePatternModelList>(), serviceProvider.GetRequiredService<FilledRegionModelList>(), serviceProvider.GetRequiredService<FillPatternModelList>());
+            return new Cleaner(
+                serviceProvider.GetRequiredService<LineStyleModelList>(),
+                serviceProvider.GetRequiredService<LinePatternModelList>(),
+                serviceProvider.GetRequiredService<FilledRegionModelList>(),
+                serviceProvider.GetRequiredService<FillPatternModelList>()
+                );
         }
 
         private NavigationBarViewModel CreateNavigationBarViewModel(IServiceProvider serviceProvider)
         {
-            return new NavigationBarViewModel(
-                CreateLineStyleNavigationService(serviceProvider),
-                CreateLinePatternNavigationService(serviceProvider),
-                CreateFilledRegionNavigationService(serviceProvider),
-                CreateFillPatternNavigationService(serviceProvider)
-                );    
+            return new NavigationBarViewModel(CreateLineStyleNavigation(serviceProvider), CreateLinePatternNavigation(serviceProvider), CreateFilledRegionNavigation(serviceProvider), CreateFillPatternNavigation(serviceProvider));
         }
 
-        private INavigationService CreateLineStyleNavigationService(IServiceProvider serviceProvider)
+        private INavigationService CreateLineStyleNavigation(IServiceProvider serviceProvider)
         {
-            return new LayoutNavigationService<LineStyleManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
-                () => serviceProvider.GetRequiredService<LineStyleManagerViewModel>(),
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateLineStyleManagerViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
+        private INavigationService CreateLinePatternNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateLinePatterManagerViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
+        private INavigationService CreateFilledRegionNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateFilledRegionManagerViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
+        private INavigationService CreateFillPatternNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateFillPatternViewModel(serviceProvider),
                 () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
             );
         }
 
-        private INavigationService CreateLinePatternNavigationService(IServiceProvider serviceProvider)
+        private MasterManagerViewModel CreateLineStyleManagerViewModel(IServiceProvider serviceProvider)
         {
-            return new LayoutNavigationService<LinePatternManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
-                () => serviceProvider.GetRequiredService<LinePatternManagerViewModel>(),
-                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
-            );
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.LineStyle);
         }
-
-        private INavigationService CreateFillPatternNavigationService(IServiceProvider serviceProvider)
+        private MasterManagerViewModel CreateLinePatterManagerViewModel(IServiceProvider serviceProvider)
         {
-            return new LayoutNavigationService<FillPatternManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
-                () => serviceProvider.GetRequiredService<FillPatternManagerViewModel>(),
-                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
-            );
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.LinePattern);
         }
-
-        private INavigationService CreateFilledRegionNavigationService(IServiceProvider serviceProvider)
+        private MasterManagerViewModel CreateFilledRegionManagerViewModel(IServiceProvider serviceProvider)
         {
-            return new LayoutNavigationService<FilledRegionManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
-                () => serviceProvider.GetRequiredService<FilledRegionManagerViewModel>(),
-                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
-            );
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.FilledRegion);
         }
-
-
-        private LineStyleManagerViewModel CreateLineStyleManagerViewModel(IServiceProvider serviceProvider)
+        private MasterManagerViewModel CreateFillPatternViewModel(IServiceProvider serviceProvider)
         {
-            return LineStyleManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>());
-        }
-
-        private LinePatternManagerViewModel CreateLinePatternManagerViewModel(IServiceProvider serviceProvider)
-        {
-            return LinePatternManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>());
-        }
-
-        private FillPatternManagerViewModel CreateFillPatternManagerViewModel(IServiceProvider serviceProvider)
-        {
-            return FillPatternManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>());
-        }
-
-        private FilledRegionManagerViewModel CreateFilledRegionManagerViewModel(IServiceProvider serviceProvider)
-        {
-            return FilledRegionManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>());
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.FillPattern);
         }
 
 

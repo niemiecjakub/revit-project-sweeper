@@ -13,7 +13,7 @@ namespace ProjectSweeper.Models
         private readonly LinePatternModelList _linePatternList;
         private readonly FilledRegionModelList _filledRegionList;
         private readonly FillPatternModelList _fillPatternList;
-
+        private readonly Dictionary<ModelTypes, IModelList> _modelLists;
 
         public Cleaner(LineStyleModelList lineStyleList, LinePatternModelList linePatternList, FilledRegionModelList filledRegionList, FillPatternModelList fillPatternList)
         {
@@ -21,7 +21,26 @@ namespace ProjectSweeper.Models
             _linePatternList = linePatternList;
             _filledRegionList = filledRegionList;
             _fillPatternList = fillPatternList;
+            _modelLists = new Dictionary<ModelTypes, IModelList>
+                {
+                    { ModelTypes.LineStyle, _lineStyleList },
+                    { ModelTypes.LinePattern, _linePatternList },
+                    { ModelTypes.FilledRegion, _filledRegionList },
+                    { ModelTypes.FillPattern, _fillPatternList },
+                };
         }
+
+        public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
+        {
+            return await _modelLists[modelType].GetAllElements();
+        }
+
+        public void DeleteElements(ModelTypes modelType, IEnumerable<IElement> elements)
+        {
+            Debug.WriteLine("CLEANER: Inside cleaner");
+            _modelLists[modelType].DeleteElements(elements);
+        }
+
 
 
         /// <summary>

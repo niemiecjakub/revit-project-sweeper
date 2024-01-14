@@ -8,32 +8,31 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ProjectSweeper.Commands
 {
     public class RemoveElementsCommand : CommandBase
     {
         private readonly CleanerStore _cleanerStore;
-        private readonly IEnumerable<IElement> _elementsToBeDeleted;
+        private readonly ModelTypes _modelType;
 
-        public RemoveElementsCommand(CleanerStore cleanerStore, IEnumerable<IElement> elementsToBeDeleted)
+        public RemoveElementsCommand(CleanerStore cleanerStore, ModelTypes modelType)
         {
             _cleanerStore = cleanerStore;
-            _elementsToBeDeleted = elementsToBeDeleted;
-
+            _modelType = modelType;
         }
 
         public override void Execute(object parameter)
         {
-            IEnumerable<IElement> elementsToBeDeleted = _elementsToBeDeleted.Where(x => !x.IsUsed && x.CanBeRemoved);
-            Debug.WriteLine($"Got {elementsToBeDeleted.Count()} to be deleted");
-            _cleanerStore.DeleteElements(elementsToBeDeleted);
-            OnCanExecuteChanged();
-        }
-
-        public override bool CanExecute(object parameter)
-        {
-            return _elementsToBeDeleted.Where(x => !x.IsUsed && x.CanBeRemoved).Count() > 0;
+            try
+            {
+                _cleanerStore.DeleteElements(_modelType);
+                OnCanExecuteChanged();
+            } catch (Exception ex)
+            {
+                MessageBox.Show($"Cant delete elements, {ex}");
+            }
         }
     }
 }

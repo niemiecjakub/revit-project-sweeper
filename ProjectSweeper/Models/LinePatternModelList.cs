@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Models
 {
-    public class LinePatternModelList 
+    public class LinePatternModelList : IModelList
     {
         private readonly ILinePatternProvider _linePatternProvider;
         private readonly IElementRemover _elementRemover;
@@ -31,6 +31,18 @@ namespace ProjectSweeper.Models
         {
             Debug.WriteLine($"LINE PATTERN LIST: inside line pattern list"); ;
             IEnumerable<ElementId> elementIds = linePatterns.Select(x => x.Id);
+            _elementRemover.Remove(elementIds);
+        }
+
+        public async Task<IEnumerable<IElement>> GetAllElements()
+        {
+            return await _linePatternProvider.GetAllElements();
+        }
+
+        public void DeleteElements(IEnumerable<IElement> elements)
+        {
+            Debug.WriteLine($"LINE PATTERN LIST: inside line pattern list"); ;
+            IEnumerable<ElementId> elementIds = elements.Select(x => x.Id);
             _elementRemover.Remove(elementIds);
         }
     }

@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="ProjectSweeper.Views.MasterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ProjectSweeper.Views"
+             xmlns:converters="clr-namespace:ProjectSweeper.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:IsUsedToColorConverter x:Key="IsUsedToColorConverter" />
+    </UserControl.Resources>
+
+    <Grid Background="DarkKhaki">
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".1*"/>
+            <RowDefinition />
+            <RowDefinition Height=".3*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width=".2*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+
+        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Name}"/>
+
+        <ListView Grid.Column="1"  Grid.Row="1" ItemsSource="{Binding Elements}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" Foreground="{Binding IsUsed, Converter={StaticResource IsUsedToColorConverter}}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel Grid.Column="1"  Grid.Row="2">
+            <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="LINE STYLES" Command="{Binding LoadLineStylesCommand}"/>
+                <Button Content="LINE PATTERNS" Command="{Binding LoadLinePatternCommand}"/>
+                <Button Content="FILL PATTERNS" Command="{Binding LoadFillPatternCommand}"/>
+                <Button Content="FILLED REGIONS" Command="{Binding LoadFilledRegionCommand}"/>
+                <Button Content="TEXTS" Command="{Binding LoadTextCommand}"/>
+                <Button Content="VIEWPORTS" Command="{Binding LoadViewportCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

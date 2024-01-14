@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ProjectSweeper.Stores
 {
@@ -13,172 +14,79 @@ namespace ProjectSweeper.Stores
     {
         private readonly Cleaner _cleaner;
 
-        private Lazy<Task> _initializeLazyLineStyles;
-        private Lazy<Task> _initializeLazyLinePatterns;
-        private Lazy<Task> _initializeLazyFilledRegions;
-        private Lazy<Task> _initializeLazyFillPatterns;
+        private readonly Dictionary<ModelTypes, Lazy<Task<IEnumerable<IElement>>>> _lazyInitializationTasks;
+        private readonly Dictionary<ModelTypes, List<IElement>> _elementCollections;
 
-        private readonly List<IElement> _lineStyles;
-        private readonly List<IElement> _linePatterns;
-        private readonly List<IElement> _filledRegions;
-        private readonly List<IElement> _fillPatterns;
+        public IEnumerable<IElement> LineStyles => GetElementCollection(ModelTypes.LineStyle);
+        public IEnumerable<IElement> LinePatterns => GetElementCollection(ModelTypes.LinePattern);
+        public IEnumerable<IElement> FilledRegions => GetElementCollection(ModelTypes.FilledRegion);
+        public IEnumerable<IElement> FillPatterns => GetElementCollection(ModelTypes.FillPattern);
 
-        public IEnumerable<IElement> LineStyles => _lineStyles;
-        public IEnumerable<IElement> LinePatterns => _linePatterns;
-        public IEnumerable<IElement> FiilledRegions => _filledRegions;
-        public IEnumerable<IElement> FillPatterns => _fillPatterns;
-
-        public event Action<IEnumerable<IElement>> LineStyleDeleted;
-        public event Action<IEnumerable<IElement>> LinePatternDeleted;
-        public event Action<IEnumerable<IElement>> FilledRegionDeleted;
-        public event Action<IEnumerable<IElement>> FillPatternDeleted;
+        public event Action<IEnumerable<IElement>> ElementDeleted;
 
         public CleanerStore(Cleaner cleaner)
         {
             _cleaner = cleaner;
-            _initializeLazyLineStyles = new Lazy<Task>(InitializeLineStyles);
-            _initializeLazyLinePatterns = new Lazy<Task>(InitializeLinePatterns);
-            _initializeLazyFilledRegions = new Lazy<Task>(InitializeFilledRegions);
-            _initializeLazyFillPatterns = new Lazy<Task>(InitializeFillPatterns);
 
-            _lineStyles = new List<IElement>();
-            _linePatterns = new List<IElement>();
-            _filledRegions = new List<IElement>();
-            _fillPatterns = new List<IElement>();
-        }
-        private async Task InitializeLineStyles()
-        {
-            Debug.WriteLine("Initializing lazy line styles");
-            IEnumerable<IElement> lineStyles = await _cleaner.GetAllLineStyles();
-            _lineStyles.Clear();
-            _lineStyles.AddRange(lineStyles);
-        }
-        private async Task InitializeLinePatterns()
-        {
-            Debug.WriteLine("Initializing lazy line patterns");
-            IEnumerable<IElement> linePatterns = await _cleaner.GetAllLinePatterns();
-            _linePatterns.Clear();
-            _linePatterns.AddRange(linePatterns);
-        }
-        private async Task InitializeFilledRegions()
-        {
-            Debug.WriteLine("Initializing lazy Filled Regions");
-            IEnumerable<IElement> filledRegions = await _cleaner.GetAllFilledRegions();
-            _filledRegions.Clear();
-            _filledRegions.AddRange(filledRegions);
-        }
-        private async Task InitializeFillPatterns()
-        {
-            Debug.WriteLine("Initializing lazy Fill Patterns");
-            IEnumerable<IElement> fillPatterns = await _cleaner.GetAllFillPatterns();
-            _fillPatterns.Clear();
-            _fillPatterns.AddRange(fillPatterns);
+            _lazyInitializationTasks = new Dictionary<ModelTypes, Lazy<Task<IEnumerable<IElement>>>>
+            {
+                { ModelTypes.LineStyle, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllLineStyles()) },
+                { ModelTypes.LinePattern, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllLinePatterns()) },
+                { ModelTypes.FilledRegion, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllFilledRegions()) },
+                { ModelTypes.FillPattern, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllFillPatterns()) },
+            };
+
+            _elementCollections = _lazyInitializationTasks.Keys.ToDictionary(key => key, key => new List<IElement>());
         }
 
-        public async Task LoadLineStyles()
+        public IEnumerable<IElement> GetElementCollection(ModelTypes modelType)
         {
-            Debug.WriteLine("Loading");
-            try
-            {
-                await _initializeLazyLineStyles.Value;
-            }
-            catch (Exception)
-            {
-                _initializeLazyLineStyles = new Lazy<Task>(InitializeLineStyles);
-            }
-        }
-        public async Task LoadLinePatterns()
-        {
-            Debug.WriteLine("Loading");
-            try
-            {
-                await _initializeLazyLinePatterns.Value;
-            }
-            catch (Exception)
-            {
-                _initializeLazyLinePatterns = new Lazy<Task>(InitializeLinePatterns);
-            }
-        }
-        public async Task LoadFilledRegions()
-        {
-            Debug.WriteLine("Loading");
-            try
-            {
-                await _initializeLazyFilledRegions.Value;
-            }
-            catch (Exception)
-            {
-                _initializeLazyFilledRegions = new Lazy<Task>(InitializeFilledRegions);
-            }
-        }
-        public async Task LoadFillPatterns()
-        {
-            Debug.WriteLine("Loading");
-            try
-            {
-                await _initializeLazyFillPatterns.Value;
-            }
-            catch (Exception)
-            {
-                _initializeLazyFillPatterns = new Lazy<Task>(InitializeFillPatterns);
-            }
+            return _elementCollections[modelType];
         }
 
-        public void DeleteElements(IEnumerable<IElement> elements)
+        private async Task InitializeElementCollection(ModelTypes modelType)
+        {
+            Debug.WriteLine($"Initializing lazy {modelType}s");
+            var elements = await _lazyInitializationTasks[modelType].Value;
+            _elementCollections[modelType].Clear();
+            _elementCollections[modelType].AddRange(elements);
+        }
+
+        public async Task LoadLineStyles() => await InitializeElementCollection(ModelTypes.LineStyle);
+        public async Task LoadLinePatterns() => await InitializeElementCollection(ModelTypes.LinePattern);
+        public async Task LoadFilledRegions() => await InitializeElementCollection(ModelTypes.FilledRegion);
+        public async Task LoadFillPatterns() => await InitializeElementCollection(ModelTypes.FillPattern);
+        public async Task LoadElements(ModelTypes modelType) => await InitializeElementCollection(modelType);
+
+
+        public void DeleteElements(ModelTypes modelType)
         {
             Debug.WriteLine("STORE: Inside store");
+            //IEnumerable<IElement> elementsToBeDeleted = _elementsToBeDeleted.Where(x => !x.IsUsed && x.CanBeRemoved);
+            //Debug.WriteLine($"Got {elementsToBeDeleted.Count()} to be deleted");
+            //_cleanerStore.DeleteElements(_modelType, elementsToBeDeleted);
 
-            ModelTypes modelType = elements.First().ModelType;
-            List<IElement> collection;
-            Action<IEnumerable<IElement>> eventAction;
 
-            switch (modelType)
-            {
-                case ModelTypes.LinePattern:
-                    collection = _linePatterns;
-                    eventAction = OnLinePatternDeleted;
-                    _cleaner.LinePatternDeleted(elements);
-                    break;
+            //List<IElement> currentElementList = _elementCollections[modelType];
+            //_cleaner.DeleteElements(modelType, currentElementList);
 
-                case ModelTypes.LineStyle:
-                    collection = _lineStyles;
-                    eventAction = OnLineStyleDeleted;
-                    _cleaner.LineStyleDeleted(elements);
-                    break;
+            //List<IElement> collectionCopy = new List<IElement>(currentElementList);
 
-                default:
-                    Debug.WriteLine("Elements are not the same model type");
-                    return;
-            }
+            //foreach (IElement element in elements)
+            //{
+            //    collectionCopy.Remove(element);
+            //}
+            //collection.Clear();
+            //collection.AddRange(collectionCopy);
 
-            List<IElement> collectionCopy = new List<IElement>(collection);
+            //Debug.WriteLine($"STORE: Left {collection.Count} {modelType}s");
 
-            foreach (IElement element in elements)
-            {
-                collectionCopy.Remove(element);
-            }
-
-            // Assign the updated collection back
-            collection.Clear();
-            collection.AddRange(collectionCopy);
-
-            Debug.WriteLine($"STORE: Left {collection.Count} {modelType}s");
-
-            eventAction?.Invoke(collection);
+            //OnElementDeleted(collection);
         }
 
-
-        private void OnLineStyleDeleted(IEnumerable<IElement> lineStyles)
+        private void OnElementDeleted(IEnumerable<IElement> elements)
         {
-            LineStyleDeleted?.Invoke(lineStyles);
+            ElementDeleted?.Invoke(elements);
         }
-
-
-        private void OnLinePatternDeleted(IEnumerable<IElement> linePatterns)
-        {
-            LinePatternDeleted?.Invoke(linePatterns);
-        }
-
-
     }
 }

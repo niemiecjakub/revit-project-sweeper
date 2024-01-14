@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Models
 {
-    public class FilledRegionModelList
+    public class FilledRegionModelList : IModelList
     {
         private readonly IFilledRegionProvider _filledRegionProvider;
         private readonly IElementRemover _elementRemover;
@@ -33,5 +33,16 @@ namespace ProjectSweeper.Models
             _elementRemover.Remove(elementIds);
         }
 
+        public async Task<IEnumerable<IElement>> GetAllElements()
+        {
+            return await _filledRegionProvider.GetAllElements();
+        }
+
+        public void DeleteElements(IEnumerable<IElement> elements)
+        {
+            Debug.WriteLine($"LINE STYLES LIST: inside line styles list"); ;
+            IEnumerable<ElementId> elementIds = elements.Select(x => x.Id);
+            _elementRemover.Remove(elementIds);
+        }
     }
 }

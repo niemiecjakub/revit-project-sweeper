@@ -7,9 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Orientation="Horizontal" Background="Orange" Height="50px">
-        <Button Content="Line Style" Command="{Binding NavigateLineStyleCommand}"/>
-        <Button Content="Line Pattern" Command="{Binding NavigateLinePatternCommand}" />
-        <Button Content="Filled Region" Command="{Binding NavigateFilledRegionComamnd}" />
-        <Button Content="Fill Pattern" Command="{Binding NavigateFillPatternCommand}" />
+        <Button Content="LINE STYLE" Command="{Binding lineStyleNavigaitonCommand}"/>
+        <Button Content="LINE PATTERN" Command="{Binding linePatternNavigationCommand}"/>
+        <Button Content="FILLED REGION" Command="{Binding FilledRegionNavigationComand}"/>
+        <Button Content="FILL PATTERN" Command="{Binding FillPatternNavigationCommand}"/>
     </StackPanel>
 </UserControl>

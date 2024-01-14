@@ -14,18 +14,9 @@
             <DataTemplate DataType="{x:Type vms:LayoutViewModel}">
                 <components:Layout />
             </DataTemplate>
-
-            <DataTemplate DataType="{x:Type vms:LinePatternManagerViewModel}">
-                <view:LinePatternManagerView />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type vms:LineStyleManagerViewModel}">
-                <view:LineStyleManagerView />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type vms:FillPatternManagerViewModel}">
-                <view:FillPatternManagerView />
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type vms:FilledRegionManagerViewModel}">
-                <view:FilledRegionManagerView />
+            
+            <DataTemplate DataType="{x:Type vms:MasterManagerViewModel}">
+                <view:MasterView />
             </DataTemplate>
         </Grid.Resources>
 

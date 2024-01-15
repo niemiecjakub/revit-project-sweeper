@@ -49,7 +49,7 @@ namespace ProjectSweeper.ViewModels
             _elements = new ObservableCollection<IElementViewModel>();
 
             LoadElementsCommand = new LoadElementsCommand(this, cleanerStore, _modelType);
-            RemoveUnusedElementsCommand = new RemoveElementsCommand(cleanerStore, ModelTypes.LineStyle);
+            RemoveUnusedElementsCommand = new RemoveElementsCommand(cleanerStore, modelType);
             _cleanerStore.ElementDeleted += OnElementDeleted;
         }
         public override void Dispose()
@@ -76,6 +76,7 @@ namespace ProjectSweeper.ViewModels
         public static MasterManagerViewModel LoadViewModel(CleanerStore cleanerStore, ModelTypes modelType)
         {
             MasterManagerViewModel viewModel = new MasterManagerViewModel(cleanerStore, modelType);
+            Console.WriteLine($"INITIALIZED WITH {modelType}");
             viewModel.LoadElementsCommand.Execute(null);
             return viewModel;
         }

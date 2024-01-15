@@ -9,85 +9,20 @@ namespace ProjectSweeper.Models
 {
     public class Cleaner
     {
-        private readonly LineStyleModelList _lineStyleList;
-        private readonly LinePatternModelList _linePatternList;
-        private readonly FilledRegionModelList _filledRegionList;
-        private readonly FillPatternModelList _fillPatternList;
-        private readonly Dictionary<ModelTypes, IModelList> _modelLists;
-
-        public Cleaner(LineStyleModelList lineStyleList, LinePatternModelList linePatternList, FilledRegionModelList filledRegionList, FillPatternModelList fillPatternList)
+        private readonly ElementModelList _elementModelList;
+        public Cleaner(ElementModelList elementModelList)
         {
-            _lineStyleList = lineStyleList;
-            _linePatternList = linePatternList;
-            _filledRegionList = filledRegionList;
-            _fillPatternList = fillPatternList;
-            _modelLists = new Dictionary<ModelTypes, IModelList>
-                {
-                    { ModelTypes.LineStyle, _lineStyleList },
-                    { ModelTypes.LinePattern, _linePatternList },
-                    { ModelTypes.FilledRegion, _filledRegionList },
-                    { ModelTypes.FillPattern, _fillPatternList },
-                };
+            _elementModelList = elementModelList;
         }
 
         public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
         {
-            return await _modelLists[modelType].GetAllElements();
+            return await _elementModelList.GetAllElements(modelType);
         }
 
-        public void DeleteElements(ModelTypes modelType, IEnumerable<IElement> elements)
+        public void DeleteElements(IEnumerable<IElement> elementsToBeDeleted)
         {
-            Debug.WriteLine("CLEANER: Inside cleaner");
-            _modelLists[modelType].DeleteElements(elements);
+            _elementModelList.DeleteElements(elementsToBeDeleted);
         }
-
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IEnumerable<IElement>> GetAllLineStyles()
-        {
-            return await _lineStyleList.GetAllLineStyles();
-        }
-        public void LineStyleDeleted(IEnumerable<IElement> lineStyles)
-        {
-            Debug.WriteLine("CLEANER: Inside cleaner");
-            _lineStyleList.DeleteLineStyle(lineStyles);
-        }
-
-
-
-        public async Task<IEnumerable<IElement>> GetAllLinePatterns()
-        {
-            return await _linePatternList.GetAllLinePatterns();
-        }
-        public void LinePatternDeleted(IEnumerable<IElement> linePatterns)
-        {
-            Debug.WriteLine("CLEANER: Inside cleaner");
-            _linePatternList.DeleteLinePatetrn(linePatterns);
-        }
-
-        public async Task<IEnumerable<IElement>> GetAllFilledRegions()
-        {
-            return await _filledRegionList.GetAllFilledRegions();
-        }
-        public void FilledRegionDeleted(IEnumerable<IElement> filledRegions)
-        {
-            Debug.WriteLine("CLEANER: Inside cleaner");
-            _filledRegionList.DeleteFilledRegion(filledRegions);
-        }
-
-        public async Task<IEnumerable<IElement>> GetAllFillPatterns()
-        {
-            return await _fillPatternList.GetAllFillPatterns();
-        }
-        public void FillPatternDeleted(IEnumerable<IElement> fillPatterns)
-        {
-            Debug.WriteLine("CLEANER: Inside cleaner");
-            _fillPatternList.DeleteFillPattern(fillPatterns);
-        }
-
     }
 }

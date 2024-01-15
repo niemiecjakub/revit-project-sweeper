@@ -8,7 +8,7 @@ namespace ProjectSweeper.Models
 {
     public interface IModelList
     {
-        Task<IEnumerable<IElement>> GetAllElements();
+        Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType);
         void DeleteElements(IEnumerable<IElement> elements);
     }
 }

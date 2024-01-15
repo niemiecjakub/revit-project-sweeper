@@ -26,11 +26,6 @@ namespace ProjectSweeper.RevitFunctions
             }
 
             SetUsedViewports(doc, filterModelList);
-
-            Debug.WriteLine($"TOTAL FILTERS {filterModelList.Count}");
-            Debug.WriteLine($"USED FILTERS {filterModelList.Where(f => f.IsUsed).Count()}");
-            Debug.WriteLine($"NOT USED FILTERS {filterModelList.Where(f => !f.IsUsed).Count()}");
-
             return filterModelList;
         }
 

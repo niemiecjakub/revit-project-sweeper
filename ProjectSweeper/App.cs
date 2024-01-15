@@ -8,11 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ProjectSweeper.Models;
 using ProjectSweeper.RevitFunctions;
 using ProjectSweeper.Services;
+using ProjectSweeper.Services.ElementProvider;
 using ProjectSweeper.Services.ElementRemover;
-using ProjectSweeper.Services.FilledRegionProvider;
-using ProjectSweeper.Services.FillPatternProvider;
-using ProjectSweeper.Services.LinePatternProvider;
-using ProjectSweeper.Services.LineStyleProvider;
 using ProjectSweeper.Stores;
 using ProjectSweeper.ViewModels;
 using ProjectSweeper.Views;
@@ -32,10 +29,7 @@ namespace ProjectSweeper
             IServiceCollection services = new ServiceCollection();
             //SERVICES
             //PROVIDERS
-            services.AddSingleton<ILinePatternProvider, LinePatternProvider>(s => new LinePatternProvider(doc));
-            services.AddSingleton<ILineStyleProvider, LineStyleProvider>(s => new LineStyleProvider(doc));
-            services.AddSingleton<IFilledRegionProvider, FilledRegionProvider>(s => new FilledRegionProvider(doc));
-            services.AddSingleton<IFillPatternProvider, FillPatternProvider>(s => new FillPatternProvider(doc));
+            services.AddSingleton<IElementProvider, ElementProvider>(s => new ElementProvider(doc));
             services.AddTransient<IElementRemover, ElementRemover>(s => new ElementRemover(doc));
             //STORES
             services.AddSingleton<CleanerStore>();
@@ -52,10 +46,7 @@ namespace ProjectSweeper
 
             //MODELS
             services.AddSingleton<Cleaner>(s => CreateCleaner(s));
-            services.AddTransient<LineStyleModelList>();
-            services.AddTransient<LinePatternModelList>();
-            services.AddTransient<FilledRegionModelList>();
-            services.AddTransient<FillPatternModelList>();
+            services.AddTransient<ElementModelList>();
 
             //VIEW MODELS
             services.AddTransient<NavigationBarViewModel>(CreateNavigationBarViewModel);
@@ -68,12 +59,7 @@ namespace ProjectSweeper
 
         private Cleaner CreateCleaner(IServiceProvider serviceProvider)
         {
-            return new Cleaner(
-                serviceProvider.GetRequiredService<LineStyleModelList>(),
-                serviceProvider.GetRequiredService<LinePatternModelList>(),
-                serviceProvider.GetRequiredService<FilledRegionModelList>(),
-                serviceProvider.GetRequiredService<FillPatternModelList>()
-                );
+            return new Cleaner(serviceProvider.GetRequiredService<ElementModelList>());
         }
 
         private NavigationBarViewModel CreateNavigationBarViewModel(IServiceProvider serviceProvider)

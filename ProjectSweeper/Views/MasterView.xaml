@@ -15,12 +15,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height=".1*"/>
             <RowDefinition />
-            <RowDefinition Height=".3*"/>
+            <RowDefinition Height=".1*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width=".2*"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
 
 
         <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Name}"/>
@@ -34,15 +30,7 @@
         </ListView>
 
         <StackPanel Grid.Column="1"  Grid.Row="2">
-            <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}"/>
-            <StackPanel Orientation="Horizontal">
-                <Button Content="LINE STYLES" Command="{Binding LoadLineStylesCommand}"/>
-                <Button Content="LINE PATTERNS" Command="{Binding LoadLinePatternCommand}"/>
-                <Button Content="FILL PATTERNS" Command="{Binding LoadFillPatternCommand}"/>
-                <Button Content="FILLED REGIONS" Command="{Binding LoadFilledRegionCommand}"/>
-                <Button Content="TEXTS" Command="{Binding LoadTextCommand}"/>
-                <Button Content="VIEWPORTS" Command="{Binding LoadViewportCommand}"/>
-            </StackPanel>
+            <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}" Height="40px"/>
         </StackPanel>
     </Grid>
 </UserControl>

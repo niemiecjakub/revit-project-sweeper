@@ -86,7 +86,7 @@ namespace ProjectSweeper.RevitFunctions
             IList<FamilyInstance> familyInstances = collector3.Cast<FamilyInstance>().ToList();
             foreach (FamilyInstance familyInstance in familyInstances)
             {
-                Debug.WriteLine(familyInstance.Name);
+                //Debug.WriteLine(familyInstance.Name);
             }
 
 

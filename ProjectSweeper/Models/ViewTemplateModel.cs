@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.Models
 {
-    public class FilterModel : IElement
+    public class ViewTemplateModel : IElement
     {
-        public ElementId Id {get;set;}
+        public ElementId Id { get; set; }
         public string Name { get; set; }
         public bool IsUsed { get; set; }
         public bool CanBeRemoved { get; set; }
-        public ModelTypes ModelType { get; set; } = ModelTypes.Filter;
+        public ModelTypes ModelType { get; set; } = ModelTypes.ViewTemplate;
 
-        public FilterModel(ElementId id, string name)
+        public ViewTemplateModel(ElementId id, string name)
         {
             Id = id;
             Name = name;
         }
-        public FilterModel(ParameterFilterElement filterElement)
+        public ViewTemplateModel(View viewTemplate)
         {
-            Id = filterElement.Id;
-            Name = filterElement.Name;
+            Id = viewTemplate.Id;
+            Name = viewTemplate.Name;
         }
     }
 }

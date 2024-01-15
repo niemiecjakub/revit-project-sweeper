@@ -3,6 +3,7 @@ using ProjectSweeper.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,8 @@ using System.Windows.Controls;
 
 namespace ProjectSweeper.RevitFunctions
 {
-    public class FilledRegionFunctions
+    public static class FilledRegionFunctions
     {
-
         public static ISet<FilledRegionModel> GetAllFilledRegions(Document doc)
         {
             ISet<FilledRegionModel> filledRegionsList = new HashSet<FilledRegionModel>();
@@ -37,8 +37,6 @@ namespace ProjectSweeper.RevitFunctions
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             IList<Element> allElements = collector.WhereElementIsNotElementType().ToElements();
 
-
-            var ids = filledRegions.Select(el => el.Id).ToList();
             foreach (Element element in allElements)
             {
                 if (element is FilledRegion)

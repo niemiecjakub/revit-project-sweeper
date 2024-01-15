@@ -17,13 +17,30 @@ namespace ProjectSweeper.ViewModels
         public ICommand linePatternNavigationCommand { get; }
         public ICommand FilledRegionNavigationComand { get; }
         public ICommand FillPatternNavigationCommand { get; }
-
-        public NavigationBarViewModel(INavigationService lineStyleNavigation, INavigationService linePatternNavigation, INavigationService filledRegionNavigation, INavigationService fillPatternNavigation)
+        public ICommand FilterNavigationCommand { get; }
+        public ICommand ViewTemplateNavigationCommand { get; }
+        public ICommand ViewportNavigationCommand { get; }
+        public ICommand TextNavigationCommand { get; }
+        public NavigationBarViewModel(INavigationService lineStyleNavigation, 
+            INavigationService linePatternNavigation, 
+            INavigationService filledRegionNavigation, 
+            INavigationService fillPatternNavigation,
+            INavigationService filterNavigation,
+            INavigationService viewTemplateNavigation,
+            INavigationService viewportNavigation,
+            INavigationService textNavigation)
+        
         {
             lineStyleNavigaitonCommand = new NavigateCommand(lineStyleNavigation);
             linePatternNavigationCommand = new NavigateCommand(linePatternNavigation);
             FilledRegionNavigationComand = new NavigateCommand(filledRegionNavigation);
             FillPatternNavigationCommand = new NavigateCommand(fillPatternNavigation);
+
+            FilterNavigationCommand = new NavigateCommand(filterNavigation);
+            ViewTemplateNavigationCommand = new NavigateCommand(viewTemplateNavigation);
+            ViewportNavigationCommand = new NavigateCommand(viewportNavigation);
+
+            TextNavigationCommand = new NavigateCommand(textNavigation);
         }
     }
 }

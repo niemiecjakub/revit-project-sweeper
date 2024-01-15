@@ -35,7 +35,8 @@ namespace ProjectSweeper.Commands
                 _masterManagerViewModel.UpdateElements(elements);
             } catch (Exception ex)
             {
-                MessageBox.Show("Failed to load filled regions", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine(ex);
+                MessageBox.Show($"Failed to load {_modelType}s", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

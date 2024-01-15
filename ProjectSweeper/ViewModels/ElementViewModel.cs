@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProjectSweeper.ViewModels
 {
-    public class ElementViewModel : IElementViewModel
+    public class ElementViewModel : ViewModelBase, IElementViewModel
     {
         private readonly IElement _element;
         public IElement Model => _element;

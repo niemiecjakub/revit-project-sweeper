@@ -64,7 +64,16 @@ namespace ProjectSweeper
 
         private NavigationBarViewModel CreateNavigationBarViewModel(IServiceProvider serviceProvider)
         {
-            return new NavigationBarViewModel(CreateLineStyleNavigation(serviceProvider), CreateLinePatternNavigation(serviceProvider), CreateFilledRegionNavigation(serviceProvider), CreateFillPatternNavigation(serviceProvider));
+            return new NavigationBarViewModel(
+                CreateLineStyleNavigation(serviceProvider), 
+                CreateLinePatternNavigation(serviceProvider), 
+                CreateFilledRegionNavigation(serviceProvider), 
+                CreateFillPatternNavigation(serviceProvider),
+                CreateFilterNavigation(serviceProvider),
+                CreateViewTemplateNavigation(serviceProvider),
+                CreateViewportNavigation(serviceProvider),
+                CreateTextNavigation(serviceProvider)
+                );
         }
 
         private INavigationService CreateLineStyleNavigation(IServiceProvider serviceProvider)
@@ -96,6 +105,35 @@ namespace ProjectSweeper
             );
         }
 
+        private INavigationService CreateFilterNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateFilterViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
+        private INavigationService CreateViewTemplateNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateViewTemplateViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
+        private INavigationService CreateViewportNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateViewportViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
+
+        private INavigationService CreateTextNavigation(IServiceProvider serviceProvider)
+        {
+            return new LayoutNavigationService<MasterManagerViewModel>(serviceProvider.GetRequiredService<NavigationStore>(),
+                () => CreateTextViewModel(serviceProvider),
+                () => serviceProvider.GetRequiredService<NavigationBarViewModel>()
+            );
+        }
         private MasterManagerViewModel CreateLineStyleManagerViewModel(IServiceProvider serviceProvider)
         {
             return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.LineStyle);
@@ -111,6 +149,22 @@ namespace ProjectSweeper
         private MasterManagerViewModel CreateFillPatternViewModel(IServiceProvider serviceProvider)
         {
             return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.FillPattern);
+        }
+        private MasterManagerViewModel CreateFilterViewModel(IServiceProvider serviceProvider)
+        {
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.Filter);
+        }
+        private MasterManagerViewModel CreateViewTemplateViewModel(IServiceProvider serviceProvider)
+        {
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.ViewTemplate);
+        }
+        private MasterManagerViewModel CreateViewportViewModel(IServiceProvider serviceProvider)
+        {
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.Viewport);
+        }
+        private MasterManagerViewModel CreateTextViewModel(IServiceProvider serviceProvider)
+        {
+            return MasterManagerViewModel.LoadViewModel(serviceProvider.GetRequiredService<CleanerStore>(), ModelTypes.Text);
         }
 
 

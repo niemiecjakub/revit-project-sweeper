@@ -1,14 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using ProjectSweeper.Models;
 using ProjectSweeper.RevitFunctions;
-using ProjectSweeper.Services.ElementProvider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectSweeper.Services.ElementRemover
+namespace ProjectSweeper.Services.ElementProvider
 {
     public class ElementProvider : IElementProvider
     {
@@ -42,12 +41,13 @@ namespace ProjectSweeper.Services.ElementRemover
                     return ViewportFunctions.GetAllViewports(_doc);
 
                 case ModelTypes.ViewTemplate:
-                    //TODO
-                    return LineFunctions.GetLineStyles(_doc);
+                    return ViewFunctions.GetAllViewTemplates(_doc);
+
+                case ModelTypes.Text:
+                    return TextFunctions.GetAllText(_doc);
 
                 default:
-                    //TODO
-                    return LineFunctions.GetLineStyles(_doc);
+                    throw new NotImplementedException();
             }
         }
     }

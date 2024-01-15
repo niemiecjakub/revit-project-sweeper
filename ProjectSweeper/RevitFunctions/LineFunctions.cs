@@ -82,7 +82,6 @@ namespace ProjectSweeper.RevitFunctions
 
         public static void SetPatternIsUsed(ISet<LinePatternModel> allPatterns, IList<Element> curves)
         {
-
             foreach (Element element in curves)
             {
                 if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Lines)

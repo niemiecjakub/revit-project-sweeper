@@ -34,6 +34,10 @@ namespace ProjectSweeper.Stores
                 { ModelTypes.LinePattern, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.LinePattern)) },
                 { ModelTypes.FilledRegion, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.FilledRegion)) },
                 { ModelTypes.FillPattern, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.FillPattern)) },
+                { ModelTypes.Filter, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.Filter)) },
+                { ModelTypes.ViewTemplate, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.ViewTemplate)) },
+                { ModelTypes.Viewport, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.Viewport)) },
+                { ModelTypes.Text, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.Text)) },
             };
 
             _elementCollections = _lazyInitializationTasks.Keys.ToDictionary(key => key, key => new List<IElement>());

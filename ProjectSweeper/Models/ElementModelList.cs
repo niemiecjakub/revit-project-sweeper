@@ -27,7 +27,7 @@ namespace ProjectSweeper.Models
 
         public void DeleteElements(IEnumerable<IElement> elements)
         {
-            Debug.WriteLine($"LINE STYLES LIST: inside line styles list"); ;
+            Debug.WriteLine($"MODEL LIST"); ;
             IEnumerable<ElementId> elementIds = elements.Select(x => x.Id);
             _elementRemover.Remove(elementIds);
         }

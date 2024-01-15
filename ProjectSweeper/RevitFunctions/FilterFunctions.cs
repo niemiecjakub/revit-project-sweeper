@@ -25,25 +25,31 @@ namespace ProjectSweeper.RevitFunctions
                 filterModelList.Add(filterModel);
             }
 
-            SetUsedViewports(doc, filterModelList);
+            SetUsedFilters(doc, filterModelList);
             return filterModelList;
         }
 
-        public static void SetUsedViewports(Document doc, ISet<FilterModel> viewportModelList)
+        public static void SetUsedFilters(Document doc, ISet<FilterModel> filterModelList)
         {
             FilteredElementCollector viewCollector = new FilteredElementCollector(doc);
             ICollection<View> views = viewCollector.OfClass(typeof(View)).Cast<View>().ToList();
 
             foreach (View view in views)
             {
-                ICollection<ElementId> filterIds = view.GetFilters();
-                foreach (ElementId filterId in filterIds)
+                try
                 {
-                    FilterModel filterModel = viewportModelList.FirstOrDefault(f => f.Id == filterId);
-                    if (filterModel == null) { continue; }
-                    filterModel.IsUsed = true;
-
+                    ICollection<ElementId> filterIds = view.GetFilters();
+                    foreach (ElementId filterId in filterIds)
+                    {
+                        FilterModel filterModel = filterModelList.FirstOrDefault(f => f.Id == filterId);
+                        if (filterModel == null) { continue; }
+                        filterModel.IsUsed = true;
+                    }
+                } catch(Exception ex)
+                {
+                    //Debug.WriteLine($"{view.Name} doesnt support filters");
                 }
+
             }
         }
     }

@@ -1,27 +1,25 @@
 ﻿using Autodesk.Revit.DB;
 using ProjectSweeper.Models;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectSweeper.RevitFunctions
 {
-    public class ViewportFunctions
+    public static class ViewportFunctions
     {
+
         public static ISet<ViewportModel> GetAllViewports(Document doc)
         {
             ISet<ViewportModel> viewportModelList = new HashSet<ViewportModel>();
 
-            FilteredElementCollector viewportCollector = new FilteredElementCollector(doc);
-            ICollection<Viewport> viewports = viewportCollector.OfClass(typeof(Viewport)).Cast<Viewport>().ToList();
+            FilteredElementCollector viewportTypeCollector = new FilteredElementCollector(doc);
+            ICollection<ElementType> viewportTypes = viewportTypeCollector.OfClass(typeof(ElementType)).Cast<ElementType>().ToList();
 
-            foreach (Viewport viewport in viewports)
+            foreach (ElementType viewportType in viewportTypes)
             {
-                ViewportModel viewportModel = new ViewportModel(viewport);
-                viewportModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, viewport.Id);
+                if (viewportType.FamilyName != "Viewport") { continue; }
+                ViewportModel viewportModel = new ViewportModel(viewportType);
+                viewportModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, viewportType.Id);
                 viewportModelList.Add(viewportModel);
             }
 
@@ -40,7 +38,10 @@ namespace ProjectSweeper.RevitFunctions
                 ICollection<ElementId> viewportIds = sheet.GetAllViewports();
                 foreach (ElementId viewportId in viewportIds)
                 {
-                    ViewportModel viewporModel = viewportModelList.FirstOrDefault(v => v.Id == viewportId);
+                    Viewport viewport = doc.GetElement(viewportId) as Viewport;
+                    ElementId viewportTypeId = viewport.GetTypeId();
+
+                    ViewportModel viewporModel = viewportModelList.FirstOrDefault(v => v.Id == viewportTypeId);
                     if (viewporModel == null) { continue; }
                     viewporModel.IsUsed = true;
                 }

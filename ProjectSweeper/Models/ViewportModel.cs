@@ -15,10 +15,10 @@ namespace ProjectSweeper.Models
         public bool CanBeRemoved { get; set; }
         public ModelTypes ModelType { get; set; } = ModelTypes.Viewport;
 
-        public ViewportModel(Viewport viewport)
+        public ViewportModel(ElementType viewportType)
         {
-            Id = viewport.Id;
-            Name = viewport.Name;
+            Id = viewportType.Id;
+            Name = viewportType.Name;
         }
 
         public ViewportModel(ElementId id, string name)

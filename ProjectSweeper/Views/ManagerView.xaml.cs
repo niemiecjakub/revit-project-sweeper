@@ -18,9 +18,9 @@ namespace ProjectSweeper.Views
     /// <summary>
     /// Interaction logic for MasterView.xaml
     /// </summary>
-    public partial class MasterView : UserControl
+    public partial class ManagerView : UserControl
     {
-        public MasterView()
+        public ManagerView()
         {
             InitializeComponent();
         }

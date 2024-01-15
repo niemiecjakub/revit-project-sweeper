@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ProjectSweeper.RevitFunctions
 {
@@ -26,7 +27,6 @@ namespace ProjectSweeper.RevitFunctions
                     if (IsSubcategoryBuiltIn(subcategory)) { continue; }
                     string name = $"{category.Name} : {subcategory.Name}";
                     ElementId id = subcategory.Id;
-
                     ObjectStyleModel objectStyleModel = new ObjectStyleModel(name, id);
                     objectStyleList.Add(objectStyleModel);
                 }
@@ -50,6 +50,7 @@ namespace ProjectSweeper.RevitFunctions
                     Category category = Category.GetCategory(doc, builtInCategory);
                     if (category != null && category.IsVisibleInUI)
                     {
+                        ElementId categoryId = category.Id;
                         List<Family> families = new FilteredElementCollector(doc)
                         .OfClass(typeof(Family))
                         .Cast<Family>()
@@ -57,8 +58,11 @@ namespace ProjectSweeper.RevitFunctions
                         .ToList();
                         foreach (Family family in families)
                         {
-                            Debug.WriteLine($"{category.Name} = {family.Name}");
                             var document = family.Document;
+                            var famDoc = document.EditFamily(family);
+
+                            Debug.WriteLine($"{category.Name} = {family.Name}");
+                            RecursiveSearch(famDoc, categoryId, objectStyleList);
                         }
                     }
 
@@ -71,35 +75,92 @@ namespace ProjectSweeper.RevitFunctions
                 }
 
             }
-
-
-            //private void MergeFamilies(Document doc, ElementId categoryId, List<string> namesOfSubcategoriesToMerge, string newCategoryName)
-            //{
-            //    List<Family> families = new FilteredElementCollector(doc)
-            //        .OfClass(typeof(Family))
-            //        .Cast<Family>()
-            //        .Where(q =>
-            //        q.FamilyCategoryId == categoryId &&
-            //        q.Name != string.Empty)
-            //        .ToList();
-            //    foreach (var family in families)
-            //    {
-            //        MergeFamilies(family, categoryId, namesOfSubcategoriesToMerge, newCategoryName);
-            //    }
-            //}
-
-            //private void MergeFamilies(Family f, ElementId categoryId, List<string> namesOfSubcategoriesToMerge, string newCategoryName)
-            //{
-            //    var document = f.Document;
-            //    var famDoc = document.EditFamily(f);
-            //    // update any subfamilies before this family
-            //    MergeFamilies(famDoc, categoryId, namesOfSubcategoriesToMerge, newCategoryName);
-            //https://boostyourbim.wordpress.com/2023/11/21/recursively-merge-subcategories-approximately-750-useful/
-
-
             Debug.WriteLine($"end function");
         }
 
+
+        private static void RecursiveSearch(Document doc, ElementId categoryId, ISet<ObjectStyleModel> objectStyleList)
+        {
+            Debug.WriteLine("OPENING");
+            List<Family> subfamilies = new FilteredElementCollector(doc)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .ToList();
+            Debug.WriteLine($"There are {subfamilies.Count} subfamilies");
+
+            foreach (Family subfamily in subfamilies)
+            {
+                RecursiveSearch(subfamily, categoryId, objectStyleList);
+            }
+        }
+
+        private static void RecursiveSearch(Family family, ElementId categoryId, ISet<ObjectStyleModel> objectStyleList)
+        {
+            Debug.WriteLine($"INSIDE {family.Name}");
+            var document = family.Document;
+            var famDoc = document.EditFamily(family);
+
+            var parentCategory = famDoc.Settings.Categories.Cast<Category>().First(q => q.Id == categoryId);
+            var subcategories = parentCategory.SubCategories.Cast<Category>();
+
+
+
+            ISet<string> usedSubcategories = new HashSet<string>();
+
+            var elements = new FilteredElementCollector(famDoc).ToList();
+            var curves = new FilteredElementCollector(famDoc).OfClass(typeof(CurveElement)).Cast<CurveElement>().ToList();
+            var lineStyles = curves.Select(q => q.LineStyle.Id.IntegerValue).ToList();
+            foreach (var e in elements)
+            {
+                if (e is GenericForm gf)
+                {
+                    usedSubcategories.Add(gf.Subcategory.Name);
+                }
+                else if (e is ModelText mt)
+                {
+                    usedSubcategories.Add(mt.Subcategory.Name);
+                }
+            }
+            foreach (var e in curves)
+            {
+                if (e is ModelCurve mc)
+                {
+                    usedSubcategories.Add(mc.Subcategory.Name);
+                }
+                else if (e is SymbolicCurve sc)
+                {
+                    usedSubcategories.Add(sc.Subcategory.Name);
+                }
+                else if (e is CurveByPoints cbp)
+                {
+                    usedSubcategories.Add(cbp.Subcategory.Name);
+                }
+            }
+            foreach (var e in curves)
+            {
+                if (e is ModelCurve mc)
+                {
+                    usedSubcategories.Add(mc.Subcategory.Name);
+                }
+                else if (e is SymbolicCurve sc)
+                {
+                    usedSubcategories.Add(sc.Subcategory.Name);
+                }
+                else if (e is CurveByPoints cbp)
+                {
+                    usedSubcategories.Add(cbp.Subcategory.Name);
+                }
+            }
+
+            foreach (string cat in usedSubcategories)
+            {
+                Debug.WriteLine(cat);
+            }
+
+            famDoc.Close(false);
+
+            RecursiveSearch(famDoc, categoryId, objectStyleList);
+        }
 
         private static bool IsSubcategoryBuiltIn(Category subcategory)
         {

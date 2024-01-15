@@ -23,5 +23,7 @@
         <Button Content="VIEWPORTS" Command="{Binding ViewportNavigationCommand}"/>
 
         <Button Content="TEXT" Command="{Binding TextNavigationCommand}"/>
+
+        <Button Content="OBJECT STYLES" Command="{Binding ObjectStyleNavigationCommand}"/>
     </StackPanel>
 </UserControl>

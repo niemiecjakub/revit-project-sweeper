@@ -92,6 +92,7 @@
     <Compile Include="Models\LinePatternModel.cs" />
     <Compile Include="Models\LineStyleModel.cs" />
     <Compile Include="Models\ModelTypes.cs" />
+    <Compile Include="Models\ObjectStyleModel.cs" />
     <Compile Include="Models\TextTypeModel.cs" />
     <Compile Include="Models\ViewportModel.cs" />
     <Compile Include="Models\ViewTemplateModel.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="RevitFunctions\FillPatternFunctions.cs" />
     <Compile Include="RevitFunctions\FilterFunctions.cs" />
     <Compile Include="RevitFunctions\LineFunctions.cs" />
+    <Compile Include="RevitFunctions\ObjectStyleFunctions.cs" />
     <Compile Include="RevitFunctions\TextFunctions.cs" />
     <Compile Include="RevitFunctions\ViewFunctions.cs" />
     <Compile Include="RevitFunctions\ViewportFunctions.cs" />

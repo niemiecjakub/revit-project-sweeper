@@ -25,12 +25,11 @@ namespace ProjectSweeper.Services.ElementRemover
         }
         public void Remove(IEnumerable<ElementId> eIds)
         {
-            Debug.WriteLine($"REMVOER: inside remover");
             try
             {
                 using (Transaction transaction = new Transaction(_doc, "Delete Element"))
                 {
-                    transaction.Start("Delete all unused linestyles");
+                    transaction.Start("Project sweeper - delete unused");
 
                     try
                     {

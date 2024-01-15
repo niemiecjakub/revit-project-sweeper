@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI.Selection;
 using ProjectSweeper.Models;
 using ProjectSweeper.RevitFunctions;
 using System;
@@ -45,6 +46,9 @@ namespace ProjectSweeper.Services.ElementProvider
 
                 case ModelTypes.Text:
                     return TextFunctions.GetAllText(_doc);
+
+                case ModelTypes.ObjectStyle:
+                    return ObjectStyleFunctions.GetAllObjectStyles(_doc);
 
                 default:
                     throw new NotImplementedException();

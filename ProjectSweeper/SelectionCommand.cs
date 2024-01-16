@@ -22,27 +22,32 @@ namespace ProjectSweeper
 
             ISet<ObjectStyleModel> objectStyleList = GetObjectStyles(doc);
 
-            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
-            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
+            //FilteredElementCollector collector = new FilteredElementCollector(doc);
+            //List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
+
+            List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
             foreach (Element selectedElement in selectedElements)
             {
                 try
                 {
-                    //Debug.WriteLine($"element is {selectedElement.Name}");
+                    Debug.WriteLine($"element is {selectedElement.Name}");
                     Category selectedElementCategory = selectedElement.Category;
                     //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
-                    Options options = new Options();
-                    //{
-                    //    IncludeNonVisibleObjects = true
-                    //};
+                    Options options = new Options()
+                    {
+                        IncludeNonVisibleObjects = true
+                    };
+
+
+
                     var solids = selectedElement.get_Geometry(options)
                         .OfType<GeometryInstance>()
-                        .SelectMany(g => g.GetInstanceGeometry())
+                        .SelectMany(g => g.GetInstanceGeometry().OfType<Solid>()
+                        .Where(s => s.Volume > 0))
                         .ToList();
 
-                    //Debug.WriteLine($"solids inside {solids.Count} ");
+
+                    Debug.WriteLine($"inside {selectedElement.Name} = {solids.Count} ");
 
                     foreach (var solid in solids)
                     {
@@ -60,7 +65,7 @@ namespace ProjectSweeper
                             {
                                 objectStyle.IsUsed = true;
                             }
-                            //Debug.WriteLine($"Selected category {objectStyle.Name} - {objectStyle.Id}");
+                            Debug.WriteLine($"+++ {objectStyle.Name} - {objectStyle.Id}");
                         }
                     }
                 }
@@ -75,39 +80,6 @@ namespace ProjectSweeper
             {
                 Debug.WriteLine(os.Name);
             }
-
-            //Reference reference = uidoc.Selection.PickObject(ObjectType.Element, "Select an element");
-            //Element selectedElement = doc.GetElement(reference);
-
-            //Debug.WriteLine($"element is {selectedElement.Name}");
-            //Category selectedElementCategory = selectedElement.Category;
-            //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
-
-            //Options options = new Options();
-            ////{
-            ////    IncludeNonVisibleObjects = true
-            ////};
-            //var solids = selectedElement.get_Geometry(options)
-            //    .OfType<GeometryInstance>()
-            //    .SelectMany(g => g.GetInstanceGeometry())
-            //    .ToList();
-
-            //foreach (var solid in solids)
-            //{
-            //    ElementId eid = solid.GraphicsStyleId;
-            //    GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
-            //    if (gs != null)
-            //    {
-            //        //Category category = gs.GraphicsStyleCategory;
-            //        //Category parentCategory = gs.GraphicsStyleCategory;
-            //        string categoryNameCombined = $"{selectedElementCategory.Name} : {gs.Name}";
-            //        Debug.WriteLine($"{selectedElementCategory.Id} : {gs.Id}");
-
-            //        IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == categoryNameCombined);
-            //        Debug.WriteLine($"Selected category {objectStyle.Name} - {objectStyle.Id}");
-            //    }
-            //}
-
             return Result.Succeeded;
         }
 

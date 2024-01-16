@@ -23,6 +23,7 @@ namespace ProjectSweeper.ViewModels
             set
             {
                 _elements = value;
+
                 OnPropertyChanged(nameof(Elements));
             }
         }

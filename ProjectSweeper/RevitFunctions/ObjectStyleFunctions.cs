@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ProjectSweeper.Models;
 using System;
 using System.Collections.Generic;
@@ -24,18 +26,74 @@ namespace ProjectSweeper.RevitFunctions
                 CategoryNameMap subcategories = category.SubCategories;
                 foreach (Category subcategory in subcategories)
                 {
-                    if (IsSubcategoryBuiltIn(subcategory)) { continue; }
+                    //if (IsSubcategoryBuiltIn(subcategory)) { continue; }
                     string name = $"{category.Name} : {subcategory.Name}";
                     ElementId id = subcategory.Id;
                     ObjectStyleModel objectStyleModel = new ObjectStyleModel(name, id);
                     objectStyleList.Add(objectStyleModel);
+
+                    if (subcategory.Id.IntegerValue == 535003)
+                    {
+                        Debug.WriteLine(subcategory.Name);
+                    }
+
                 }
             }
 
-            SetUsedObjectStyles(doc, objectStyleList);
+            //SetUsedObjectStylesFamilyInstance(doc, objectStyleList);
 
             return objectStyleList;
         }
+
+        private static void SetUsedObjectStylesFamilyInstance(Document doc, ISet<ObjectStyleModel> objectStyleList)
+        {
+            //List<Family> families = new FilteredElementCollector(doc).OfClass(typeof(Family)).Cast<Family>().ToList();
+            var families = new FilteredElementCollector(doc).WhereElementIsNotElementType().ToList();
+            foreach (Element family in families)
+            {
+                try
+                {
+                    Debug.WriteLine($"element is {family.Name}");
+                    Category familyCategory = family.Category;
+                    Options options = new Options();
+                    //{
+                    //    IncludeNonVisibleObjects = true
+                    //};
+
+                    var solids = family.get_Geometry(options)
+                        .OfType<GeometryInstance>()
+                        .SelectMany(g => g.GetInstanceGeometry())
+                        .ToList();
+
+                    Debug.WriteLine($"element category is {familyCategory.Name} with {solids.Count} solids");
+                    foreach (var solid in solids)
+                    {
+                        ElementId eid = solid.GraphicsStyleId;
+                        GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
+                        if (gs != null)
+                        {
+                            //Category category = gs.GraphicsStyleCategory;
+                            //Category parentCategory = gs.GraphicsStyleCategory;
+                            string categoryNameCombined = $"{family.Name} : {gs.Name}";
+                            Debug.WriteLine($"{family.Id} : {gs.Id}");
+
+                            IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == categoryNameCombined);
+                            if (objectStyle != null)
+                            {
+                                Debug.WriteLine($"Selected category {objectStyle.Name} - {objectStyle.Id}");
+                                objectStyle.IsUsed = true;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+        }
+
+
 
         private static void SetUsedObjectStyles(Document doc, ISet<ObjectStyleModel> objectStyleList)
         {

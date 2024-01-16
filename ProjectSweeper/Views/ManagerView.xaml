@@ -24,7 +24,11 @@
         <ListView Grid.Column="1"  Grid.Row="1" ItemsSource="{Binding Elements}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" Foreground="{Binding IsUsed, Converter={StaticResource IsUsedToColorConverter}}" />
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}" Foreground="{Binding IsUsed, Converter={StaticResource IsUsedToColorConverter}}" />
+                        <TextBlock Text="         "/>
+                        <TextBlock Text="{Binding Id.IntegerValue}"/>
+                    </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

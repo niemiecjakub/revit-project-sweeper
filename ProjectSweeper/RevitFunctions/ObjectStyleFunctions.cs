@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace ProjectSweeper.RevitFunctions
 {
@@ -30,7 +31,13 @@ namespace ProjectSweeper.RevitFunctions
             }
 
             SetUsedObjectStylesFamilyInstanceSolids(doc, objectStyleList);
-            SetUsedObjectStylesImportInstance(doc, objectStyleList);
+            //SetUsedObjectStylesImportInstance(doc, objectStyleList);
+
+            Debug.WriteLine("USED STYLES");
+            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
+            {
+                Debug.WriteLine(os.Name);
+            }
 
             return objectStyleList;
         }
@@ -40,13 +47,11 @@ namespace ProjectSweeper.RevitFunctions
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
 
-            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
             foreach (Element selectedElement in selectedElements)
             {
                 try
                 {
                     Category selectedElementCategory = selectedElement.Category;
-                    //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
                     Options options = new Options()
                     {
                         DetailLevel = ViewDetailLevel.Fine,
@@ -54,7 +59,24 @@ namespace ProjectSweeper.RevitFunctions
                         ComputeReferences = true
                     };
 
+                    if (selectedElement is AnnotationSymbol annotation)
+                    {
+                        Family family = annotation.Symbol.Family;
+                        Document familyDoc = doc.EditFamily(family);
+                        if (null != familyDoc && familyDoc.IsFamilyDocument == true)
+                        {
+                            FilteredElementCollector lineCollector = new FilteredElementCollector(familyDoc).OfClass(typeof(CurveElement)).WhereElementIsNotElementType();
+                            HashSet<string> curveNames = lineCollector.Cast<CurveElement>().Select(l => l.Name).ToHashSet();
+                            foreach(string name in curveNames)
+                            {
+                                Debug.WriteLine(name);
+                            }
+                        }
 
+                    }
+                    //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
+
+                    //SOLIDS FOR FAMILY INSTANCES
                     var solids = selectedElement.get_Geometry(options)
                         .OfType<GeometryInstance>()
                         .SelectMany(g => g.GetInstanceGeometry().OfType<Solid>()
@@ -68,8 +90,6 @@ namespace ProjectSweeper.RevitFunctions
                         GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
                         if (gs != null)
                         {
-                            //Category category = gs.GraphicsStyleCategory;
-                            //Category parentCategory = gs.GraphicsStyleCategory;
                             string categoryNameCombined = $"{selectedElementCategory.Name} : {gs.Name}";
 
                             IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == categoryNameCombined);
@@ -80,6 +100,7 @@ namespace ProjectSweeper.RevitFunctions
                             //Debug.WriteLine($"+++ {objectStyle.Name} - {objectStyle.Id}");
                         }
                     }
+
                 }
                 catch (Exception e)
                 {
@@ -134,12 +155,6 @@ namespace ProjectSweeper.RevitFunctions
                 {
 
                 }
-            }
-
-            Debug.WriteLine("USED STYLES");
-            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
-            {
-                Debug.WriteLine(os.Name);
             }
         }
 

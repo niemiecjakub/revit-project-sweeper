@@ -28,9 +28,69 @@ namespace ProjectSweeper
             //import instances
             SetUsedObjectStylesImportInstance(uidoc, doc, objectStyleList);
 
+            //annotation families
+            SetUsedObjectStylesAnnotationFamilies(uidoc, doc, objectStyleList);
+
             return Result.Succeeded;
         }
 
+        private void SetUsedObjectStylesAnnotationFamilies(UIDocument uidoc, Document doc, ISet<ObjectStyleModel> objectStyleList)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<ImportInstance> selectedElements = collector.WhereElementIsNotElementType().OfType<ImportInstance>().ToList();
+
+            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
+            foreach (ImportInstance selectedElement in selectedElements)
+            {
+                try
+                {
+                    Category selectedElementCategory = selectedElement.Category;
+                    //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
+                    Options options = new Options()
+                    {
+                        DetailLevel = ViewDetailLevel.Fine,
+                        IncludeNonVisibleObjects = true,
+                        ComputeReferences = true
+                    };
+
+                    var importCurves = selectedElement.get_Geometry(options)
+                        .OfType<GeometryInstance>()
+                        .SelectMany(g => g.GetInstanceGeometry().OfType<Curve>())
+                        .ToList();
+
+                    var importCurveStyles = new HashSet<string>(
+                        importCurves
+                            .Select(curve =>
+                            {
+                                ElementId eid = curve.GraphicsStyleId;
+                                GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
+                                return $"{selectedElementCategory.Name} : {gs?.GraphicsStyleCategory?.Name}";
+                            })
+                    );
+
+                    foreach (string curveStyle in importCurveStyles)
+                    {
+                        IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == curveStyle);
+                        if (objectStyle != null)
+                        {
+                            objectStyle.IsUsed = true;
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            Debug.WriteLine("USED STYLES");
+            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
+            {
+                Debug.WriteLine(os.Name);
+            }
+
+        }
         private void SetUsedObjectStylesImportInstance(UIDocument uidoc, Document doc, ISet<ObjectStyleModel> objectStyleList)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc);

@@ -12,34 +12,26 @@ namespace ProjectSweeper.Stores
 {
     public class CleanerStore
     {
+        private readonly Document _doc;
         private readonly Cleaner _cleaner;
 
         private readonly Dictionary<ModelTypes, Lazy<Task<IEnumerable<IElement>>>> _lazyInitializationTasks;
         private Dictionary<ModelTypes, List<IElement>> _elementCollections;
 
-        //public IEnumerable<IElement> LineStyles => GetElementCollection(ModelTypes.LineStyle);
-        //public IEnumerable<IElement> LinePatterns => GetElementCollection(ModelTypes.LinePattern);
-        //public IEnumerable<IElement> FilledRegions => GetElementCollection(ModelTypes.FilledRegion);
-        //public IEnumerable<IElement> FillPatterns => GetElementCollection(ModelTypes.FillPattern);
 
         public event Action<IEnumerable<IElement>> ElementDeleted;
 
-        public CleanerStore(Cleaner cleaner)
+        public CleanerStore(Cleaner cleaner, Document doc)
         {
+            _doc = doc;
             _cleaner = cleaner;
 
-            _lazyInitializationTasks = new Dictionary<ModelTypes, Lazy<Task<IEnumerable<IElement>>>>
-            {
-                { ModelTypes.LineStyle, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.LineStyle)) },
-                { ModelTypes.LinePattern, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.LinePattern)) },
-                { ModelTypes.FilledRegion, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.FilledRegion)) },
-                { ModelTypes.FillPattern, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.FillPattern)) },
-                { ModelTypes.Filter, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.Filter)) },
-                { ModelTypes.ViewTemplate, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.ViewTemplate)) },
-                { ModelTypes.Viewport, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.Viewport)) },
-                { ModelTypes.Text, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.Text)) },
-                { ModelTypes.ObjectStyle, new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(ModelTypes.ObjectStyle)) },
-            };
+            _lazyInitializationTasks = Enum.GetValues(typeof(ModelTypes))
+                .Cast<ModelTypes>()
+                .ToDictionary(
+                    modelType => modelType,
+                    modelType => new Lazy<Task<IEnumerable<IElement>>>(async () => await _cleaner.GetAllElements(modelType))
+                );
 
             _elementCollections = _lazyInitializationTasks.Keys.ToDictionary(key => key, key => new List<IElement>());
         }
@@ -53,8 +45,15 @@ namespace ProjectSweeper.Stores
         {
             Debug.WriteLine($"Initializing lazy {modelType}s");
             IEnumerable<IElement> elements = await _lazyInitializationTasks[modelType].Value;
+            IEnumerable<IElement> validElements = elements.Where(e =>
+            {
+                Element element = _doc.GetElement(e.Id);
+                Category category = Category.GetCategory(_doc, e.Id);
+                return element != null || category != null;
+            });
+
             _elementCollections[modelType].Clear();
-            _elementCollections[modelType].AddRange(elements);
+            _elementCollections[modelType].AddRange(validElements);
         }
 
         public async Task LoadElements(ModelTypes modelType) => await InitializeElementCollection(modelType);
@@ -64,9 +63,9 @@ namespace ProjectSweeper.Stores
             Debug.WriteLine("STORE:");
 
             IEnumerable<IElement> elementsToBeDeleted = _elementCollections[modelType].Where(x => !x.IsUsed && x.CanBeRemoved);
-            if (elementsToBeDeleted.Count() == 0) 
+            if (elementsToBeDeleted.Count() == 0)
             {
-                Console.WriteLine("Nothing to delete");
+                Debug.WriteLine("Nothing to delete");
                 return;
             }
 
@@ -75,18 +74,13 @@ namespace ProjectSweeper.Stores
 
             _cleaner.DeleteElements(elementsToBeDeleted);
 
-            List<IElement> collectionCopy = new List<IElement>(_elementCollections[modelType]);
-            foreach (IElement element in elementsToBeDeleted)
-            {
-                collectionCopy.Remove(element);
-            }
-            _elementCollections[modelType].Clear();
-            _elementCollections[modelType].AddRange(collectionCopy);
+            _elementCollections[modelType].RemoveAll(element => elementsToBeDeleted.Contains(element));
 
             Debug.WriteLine($"STORE: Left {_elementCollections[modelType].Count} {modelType}s");
 
             OnElementDeleted(_elementCollections[modelType]);
         }
+
 
         private void OnElementDeleted(IEnumerable<IElement> elements)
         {

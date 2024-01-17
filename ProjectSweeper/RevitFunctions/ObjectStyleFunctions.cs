@@ -1,11 +1,8 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using ProjectSweeper.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace ProjectSweeper.RevitFunctions
 {
@@ -30,256 +27,124 @@ namespace ProjectSweeper.RevitFunctions
                 }
             }
 
-            SetUsedObjectStylesFamilyInstanceSolids(doc, objectStyleList);
-            //SetUsedObjectStylesImportInstance(doc, objectStyleList);
+            HashSet<string> usedObjectStyles = GetUsedObjects(doc);
 
-            Debug.WriteLine("USED STYLES");
-            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
+            foreach (string objectStyle in usedObjectStyles)
             {
-                Debug.WriteLine(os.Name);
+                ObjectStyleModel objectStyleModel = objectStyleList.FirstOrDefault(x => x.Name == objectStyle);
+                if (objectStyleModel != null)
+                {
+                    objectStyleModel.IsUsed = true;
+                }
             }
 
             return objectStyleList;
         }
-
-        private static void SetUsedObjectStylesFamilyInstanceSolids(Document doc, ISet<ObjectStyleModel> objectStyleList)
+        private static HashSet<string> GetUsedObjects(Document doc)
         {
+            HashSet<string> analyzedFamilies = new HashSet<string>();
+            HashSet<string> usedObjectStyles = new HashSet<string>();
+
             FilteredElementCollector collector = new FilteredElementCollector(doc);
-            List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
+            List<Element> selectedElements = collector.WhereElementIsNotElementType().Where(elem => elem is FamilyInstance || elem is ImportInstance).ToList();
+
+
+            Options options = new Options()
+            {
+                DetailLevel = ViewDetailLevel.Fine,
+                IncludeNonVisibleObjects = true,
+                ComputeReferences = true
+            };
 
             foreach (Element selectedElement in selectedElements)
             {
-                try
+                GetUsedObjectStylesFromLoadableFamilies(doc, usedObjectStyles, selectedElement, analyzedFamilies, options);
+            }
+
+            return usedObjectStyles;
+
+        }
+
+        private static void GetUsedObjectStylesFromLoadableFamilies(Document doc, HashSet<string> usedObjectStyles, Element selectedElement, HashSet<string> analyzedFamilies, Options options)
+        {
+            try
+            {
+                Category mainCategory = selectedElement.Category;
+                if (selectedElement is FamilyInstance familyInstance)
                 {
-                    Category selectedElementCategory = selectedElement.Category;
-                    Options options = new Options()
-                    {
-                        DetailLevel = ViewDetailLevel.Fine,
-                        IncludeNonVisibleObjects = true,
-                        ComputeReferences = true
-                    };
 
-                    if (selectedElement is AnnotationSymbol annotation)
-                    {
-                        Family family = annotation.Symbol.Family;
-                        Document familyDoc = doc.EditFamily(family);
-                        if (null != familyDoc && familyDoc.IsFamilyDocument == true)
-                        {
-                            FilteredElementCollector lineCollector = new FilteredElementCollector(familyDoc).OfClass(typeof(CurveElement)).WhereElementIsNotElementType();
-                            HashSet<string> curveNames = lineCollector.Cast<CurveElement>().Select(l => l.Name).ToHashSet();
-                            foreach(string name in curveNames)
-                            {
-                                Debug.WriteLine(name);
-                            }
-                        }
+                    Family family = familyInstance.Symbol.Family;
+                    string familyName = family.Name;
 
+                    if (analyzedFamilies.Contains(familyName))
+                    {
+                        return;
                     }
-                    //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
 
-                    //SOLIDS FOR FAMILY INSTANCES
-                    var solids = selectedElement.get_Geometry(options)
+                    Document familyDoc = doc.EditFamily(family);
+                    if (null == familyDoc && familyDoc.IsFamilyDocument == false)
+                    {
+                        return;
+                    }
+
+                    List<Element> nestedFams = new FilteredElementCollector(familyDoc).WhereElementIsNotElementType().Where(elem => elem is FamilyInstance || elem is ImportInstance).ToList();
+                    foreach (Element nestedElement in nestedFams)
+                    {
+                        GetUsedObjectStylesFromLoadableFamilies(doc, usedObjectStyles, nestedElement, analyzedFamilies, options);
+                    }
+
+                    //CURVE ELEMENT STYLES
+                    FilteredElementCollector curveElementCollector = new FilteredElementCollector(familyDoc).OfClass(typeof(CurveElement)).WhereElementIsNotElementType();
+                    HashSet<string> curveStyeNames = curveElementCollector.Cast<CurveElement>().Select(l => l.LineStyle.Name).ToHashSet();
+                    foreach (string styleName in curveStyeNames)
+                    {
+                        usedObjectStyles.Add($"{mainCategory.Name} : {styleName}");
+                    }
+
+                    //SOLID ELEMENT STYLES
+                    List<Solid> solids = familyInstance.get_Geometry(options)
                         .OfType<GeometryInstance>()
                         .SelectMany(g => g.GetInstanceGeometry().OfType<Solid>()
                         .Where(s => s.Volume > 0))
                         .ToList();
 
 
-                    foreach (var solid in solids)
+                    foreach (Solid solid in solids)
                     {
                         ElementId eid = solid.GraphicsStyleId;
                         GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
                         if (gs != null)
                         {
-                            string categoryNameCombined = $"{selectedElementCategory.Name} : {gs.Name}";
-
-                            IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == categoryNameCombined);
-                            if (objectStyle != null)
-                            {
-                                objectStyle.IsUsed = true;
-                            }
-                            //Debug.WriteLine($"+++ {objectStyle.Name} - {objectStyle.Id}");
+                            string categoryNameCombined = $"{mainCategory.Name} : {gs.Name}";
+                            usedObjectStyles.Add(categoryNameCombined);
                         }
                     }
-
                 }
-                catch (Exception e)
+
+                //IMPORT INSTANCE
+                if (selectedElement is ImportInstance importInstance)
                 {
+                    List<Curve> importCurves = selectedElement.get_Geometry(options)
+                    .OfType<GeometryInstance>()
+                    .SelectMany(g => g.GetInstanceGeometry().OfType<Curve>())
+                    .ToList();
 
-                }
-            }
-        }
-
-        private static void SetUsedObjectStylesImportInstance(Document doc, ISet<ObjectStyleModel> objectStyleList)
-        {
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            List<ImportInstance> selectedElements = collector.WhereElementIsNotElementType().OfType<ImportInstance>().ToList();
-
-            foreach (ImportInstance selectedElement in selectedElements)
-            {
-                try
-                {
-                    Category selectedElementCategory = selectedElement.Category;
-                    Options options = new Options()
+                    foreach (Curve importCurve in importCurves)
                     {
-                        DetailLevel = ViewDetailLevel.Fine,
-                        IncludeNonVisibleObjects = true,
-                        ComputeReferences = true
-                    };
-
-                    var importCurves = selectedElement.get_Geometry(options)
-                        .OfType<GeometryInstance>()
-                        .SelectMany(g => g.GetInstanceGeometry().OfType<Curve>())
-                        .ToList();
-
-                    var importCurveStyles = new HashSet<string>(
-                        importCurves
-                            .Select(curve =>
-                            {
-                                ElementId eid = curve.GraphicsStyleId;
-                                GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
-                                return $"{selectedElementCategory.Name} : {gs?.GraphicsStyleCategory?.Name}";
-                            })
-                    );
-
-                    foreach (string curveStyle in importCurveStyles)
-                    {
-                        IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == curveStyle);
-                        if (objectStyle != null)
+                        ElementId eid = importCurve.GraphicsStyleId;
+                        GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
+                        if (gs != null)
                         {
-                            objectStyle.IsUsed = true;
+                            string importCurveStyle = $"{mainCategory.Name} : {gs.GraphicsStyleCategory.Name}";
+                            usedObjectStyles.Add(importCurveStyle);
                         }
                     }
-
-                }
-                catch (Exception ex)
-                {
-
                 }
             }
-        }
-
-
-        //LEGACY
-        private static void SetUsedObjectStyles(Document doc, ISet<ObjectStyleModel> objectStyleList)
-        {
-
-            Debug.WriteLine($"stayrt function");
-            IEnumerable<BuiltInCategory> allBuiltInCategories = Enum.GetValues(typeof(BuiltInCategory)).Cast<BuiltInCategory>();
-
-            foreach (BuiltInCategory builtInCategory in allBuiltInCategories)
+            catch (Exception ex)
             {
-                try
-                {
-                    Category category = Category.GetCategory(doc, builtInCategory);
-                    if (category != null && category.IsVisibleInUI)
-                    {
-                        ElementId categoryId = category.Id;
-                        List<Family> families = new FilteredElementCollector(doc)
-                        .OfClass(typeof(Family))
-                        .Cast<Family>()
-                        .Where(q => q.FamilyCategoryId == category.Id && q.Name != string.Empty)
-                        .ToList();
-                        foreach (Family family in families)
-                        {
-                            var document = family.Document;
-                            var famDoc = document.EditFamily(family);
 
-                            Debug.WriteLine($"{category.Name} = {family.Name}");
-                            RecursiveSearch(famDoc, categoryId, objectStyleList);
-                        }
-                    }
-
-                    //ElementCategoryFilter(builtInCategory);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"error occured for {builtInCategory}");
-                }
             }
-            Debug.WriteLine($"end function");
-        }
-
-
-        private static void RecursiveSearch(Document doc, ElementId categoryId, ISet<ObjectStyleModel> objectStyleList)
-        {
-            Debug.WriteLine("OPENING");
-            List<Family> subfamilies = new FilteredElementCollector(doc)
-                .OfClass(typeof(Family))
-                .Cast<Family>()
-                .ToList();
-            Debug.WriteLine($"There are {subfamilies.Count} subfamilies");
-
-            foreach (Family subfamily in subfamilies)
-            {
-                RecursiveSearch(subfamily, categoryId, objectStyleList);
-            }
-        }
-
-        private static void RecursiveSearch(Family family, ElementId categoryId, ISet<ObjectStyleModel> objectStyleList)
-        {
-            Debug.WriteLine($"INSIDE {family.Name}");
-            var document = family.Document;
-            var famDoc = document.EditFamily(family);
-
-            var parentCategory = famDoc.Settings.Categories.Cast<Category>().First(q => q.Id == categoryId);
-            var subcategories = parentCategory.SubCategories.Cast<Category>();
-
-
-            ISet<string> usedSubcategories = new HashSet<string>();
-
-            var elements = new FilteredElementCollector(famDoc).ToList();
-            var curves = new FilteredElementCollector(famDoc).OfClass(typeof(CurveElement)).Cast<CurveElement>().ToList();
-            var lineStyles = curves.Select(q => q.LineStyle.Id.IntegerValue).ToList();
-            foreach (var e in elements)
-            {
-                if (e is GenericForm gf)
-                {
-                    usedSubcategories.Add(gf.Subcategory.Name);
-                }
-                else if (e is ModelText mt)
-                {
-                    usedSubcategories.Add(mt.Subcategory.Name);
-                }
-            }
-            foreach (var e in curves)
-            {
-                if (e is ModelCurve mc)
-                {
-                    usedSubcategories.Add(mc.Subcategory.Name);
-                }
-                else if (e is SymbolicCurve sc)
-                {
-                    usedSubcategories.Add(sc.Subcategory.Name);
-                }
-                else if (e is CurveByPoints cbp)
-                {
-                    usedSubcategories.Add(cbp.Subcategory.Name);
-                }
-            }
-            foreach (var e in curves)
-            {
-                if (e is ModelCurve mc)
-                {
-                    usedSubcategories.Add(mc.Subcategory.Name);
-                }
-                else if (e is SymbolicCurve sc)
-                {
-                    usedSubcategories.Add(sc.Subcategory.Name);
-                }
-                else if (e is CurveByPoints cbp)
-                {
-                    usedSubcategories.Add(cbp.Subcategory.Name);
-                }
-            }
-
-            foreach (string cat in usedSubcategories)
-            {
-                Debug.WriteLine(cat);
-            }
-
-            famDoc.Close(false);
-
-            RecursiveSearch(famDoc, categoryId, objectStyleList);
         }
 
         private static bool IsSubcategoryBuiltIn(Category subcategory)

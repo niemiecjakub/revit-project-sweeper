@@ -82,6 +82,7 @@
       <DependentUpon>NavigationBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\IsUsedToColorConverter.cs" />
+    <Compile Include="Converters\IsUsedToColorMultiValueConverter.cs" />
     <Compile Include="Models\Cleaner.cs" />
     <Compile Include="Models\ElementModelList.cs" />
     <Compile Include="Models\FilledRegionModel.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="RevitFunctions\TextFunctions.cs" />
     <Compile Include="RevitFunctions\ViewFunctions.cs" />
     <Compile Include="RevitFunctions\ViewportFunctions.cs" />
-    <Compile Include="SelectionCommand.cs" />
+    <Compile Include="ExplodeAndDeleteGroupCommand.cs" />
     <Compile Include="Services\ElementProvider\IElementProvider.cs" />
     <Compile Include="Services\ElementProvider\ElementProvider.cs" />
     <Compile Include="Services\ElementRemover\ElementRemover.cs" />

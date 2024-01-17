@@ -25,6 +25,7 @@ namespace ProjectSweeper
         {
             UIApplication uiapp = commandData.Application;
             Document doc = uiapp.ActiveUIDocument.Document;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
 
             IServiceCollection services = new ServiceCollection();
             //SERVICES
@@ -32,7 +33,7 @@ namespace ProjectSweeper
             services.AddSingleton<IElementProvider, ElementProvider>(s => new ElementProvider(doc));
             services.AddTransient<IElementRemover, ElementRemover>(s => new ElementRemover(doc));
             //STORES
-            services.AddSingleton<CleanerStore>();
+            services.AddSingleton<CleanerStore>(s => new CleanerStore(s.GetRequiredService<Cleaner>(), doc));
             services.AddSingleton<NavigationStore>();
 
             //NAVIGATION SERVICE
@@ -45,7 +46,7 @@ namespace ProjectSweeper
             });
 
             //MODELS
-            services.AddSingleton<Cleaner>(s => CreateCleaner(s));
+            services.AddSingleton<Cleaner>(s => new Cleaner(s.GetRequiredService<ElementModelList>()));
             services.AddTransient<ElementModelList>();
 
             //VIEW MODELS
@@ -57,10 +58,6 @@ namespace ProjectSweeper
             _serviceProvider = services.BuildServiceProvider();
         }
 
-        private Cleaner CreateCleaner(IServiceProvider serviceProvider)
-        {
-            return new Cleaner(serviceProvider.GetRequiredService<ElementModelList>());
-        }
 
         private NavigationBarViewModel CreateNavigationBarViewModel(IServiceProvider serviceProvider)
         {

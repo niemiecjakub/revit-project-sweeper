@@ -1,9 +1,11 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using ProjectSweeper.Models;
 using ProjectSweeper.RevitFunctions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ namespace ProjectSweeper.Services.ElementProvider
 
         public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
         {
+            Debug.WriteLine("Provider");
             switch (modelType)
             {
                 case ModelTypes.LineStyle:

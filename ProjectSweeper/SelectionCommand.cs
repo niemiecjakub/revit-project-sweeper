@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,23 +22,90 @@ namespace ProjectSweeper
             Document doc = uidoc.Document;
 
             ISet<ObjectStyleModel> objectStyleList = GetObjectStyles(doc);
+            //solids in family instances
+            //SetUsedObjectStylesFamilyInstanceSolids(doc, objectStyleList);
 
-            //FilteredElementCollector collector = new FilteredElementCollector(doc);
-            //List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
+            //import instances
+            SetUsedObjectStylesImportInstance(uidoc, doc, objectStyleList);
 
-            List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
-            foreach (Element selectedElement in selectedElements)
+            return Result.Succeeded;
+        }
+
+        private void SetUsedObjectStylesImportInstance(UIDocument uidoc, Document doc, ISet<ObjectStyleModel> objectStyleList)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<ImportInstance> selectedElements = collector.WhereElementIsNotElementType().OfType<ImportInstance>().ToList();
+
+            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
+            foreach (ImportInstance selectedElement in selectedElements)
             {
                 try
                 {
-                    Debug.WriteLine($"element is {selectedElement.Name}");
                     Category selectedElementCategory = selectedElement.Category;
                     //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
                     Options options = new Options()
                     {
-                        IncludeNonVisibleObjects = true
+                        DetailLevel = ViewDetailLevel.Fine,
+                        IncludeNonVisibleObjects = true,
+                        ComputeReferences = true
                     };
 
+                    var importCurves = selectedElement.get_Geometry(options)
+                        .OfType<GeometryInstance>()
+                        .SelectMany(g => g.GetInstanceGeometry().OfType<Curve>())
+                        .ToList();
+
+                    var importCurveStyles = new HashSet<string>(
+                        importCurves
+                            .Select(curve =>
+                            {
+                                ElementId eid = curve.GraphicsStyleId;
+                                GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
+                                return $"{selectedElementCategory.Name} : {gs?.GraphicsStyleCategory?.Name}";
+                            })
+                    );
+
+                    foreach(string curveStyle in importCurveStyles)
+                    {
+                        IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == curveStyle);
+                        if (objectStyle != null)
+                        {
+                            objectStyle.IsUsed = true;
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            Debug.WriteLine("USED STYLES");
+            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
+            {
+                Debug.WriteLine(os.Name);
+            }
+        }
+
+        private void SetUsedObjectStylesFamilyInstanceSolids(Document doc, ISet<ObjectStyleModel> objectStyleList)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
+
+            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
+            foreach (Element selectedElement in selectedElements)
+            {
+                try
+                {
+                    Category selectedElementCategory = selectedElement.Category;
+                    //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
+                    Options options = new Options()
+                    {
+                        DetailLevel = ViewDetailLevel.Fine,
+                        IncludeNonVisibleObjects = true,
+                        ComputeReferences = true
+                    };
 
 
                     var solids = selectedElement.get_Geometry(options)
@@ -46,8 +114,6 @@ namespace ProjectSweeper
                         .Where(s => s.Volume > 0))
                         .ToList();
 
-
-                    Debug.WriteLine($"inside {selectedElement.Name} = {solids.Count} ");
 
                     foreach (var solid in solids)
                     {
@@ -58,7 +124,6 @@ namespace ProjectSweeper
                             Category category = gs.GraphicsStyleCategory;
                             Category parentCategory = gs.GraphicsStyleCategory;
                             string categoryNameCombined = $"{selectedElementCategory.Name} : {gs.Name}";
-                            //Debug.WriteLine($"{categoryNameCombined}");
 
                             IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == categoryNameCombined);
                             if (objectStyle != null)
@@ -74,13 +139,6 @@ namespace ProjectSweeper
 
                 }
             }
-
-            Debug.WriteLine("USED STYLES");
-            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
-            {
-                Debug.WriteLine(os.Name);
-            }
-            return Result.Succeeded;
         }
 
         private ISet<ObjectStyleModel> GetObjectStyles(Document doc)

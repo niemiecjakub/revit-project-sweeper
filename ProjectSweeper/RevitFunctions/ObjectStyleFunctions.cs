@@ -1,16 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using ProjectSweeper.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ProjectSweeper.RevitFunctions
 {
@@ -26,46 +20,48 @@ namespace ProjectSweeper.RevitFunctions
                 CategoryNameMap subcategories = category.SubCategories;
                 foreach (Category subcategory in subcategories)
                 {
-                    //if (IsSubcategoryBuiltIn(subcategory)) { continue; }
+                    if (IsSubcategoryBuiltIn(subcategory)) { continue; }
                     string name = $"{category.Name} : {subcategory.Name}";
                     ElementId id = subcategory.Id;
                     ObjectStyleModel objectStyleModel = new ObjectStyleModel(name, id);
+                    objectStyleModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, subcategory.Id);
                     objectStyleList.Add(objectStyleModel);
-
-                    if (subcategory.Id.IntegerValue == 535003)
-                    {
-                        Debug.WriteLine(subcategory.Name);
-                    }
-
                 }
             }
 
-            //SetUsedObjectStylesFamilyInstance(doc, objectStyleList);
+            SetUsedObjectStylesFamilyInstanceSolids(doc, objectStyleList);
+            SetUsedObjectStylesImportInstance(doc, objectStyleList);
 
             return objectStyleList;
         }
 
-        private static void SetUsedObjectStylesFamilyInstance(Document doc, ISet<ObjectStyleModel> objectStyleList)
+        private static void SetUsedObjectStylesFamilyInstanceSolids(Document doc, ISet<ObjectStyleModel> objectStyleList)
         {
-            //List<Family> families = new FilteredElementCollector(doc).OfClass(typeof(Family)).Cast<Family>().ToList();
-            var families = new FilteredElementCollector(doc).WhereElementIsNotElementType().ToList();
-            foreach (Element family in families)
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<Element> selectedElements = collector.WhereElementIsNotElementType().OfType<FamilyInstance>().Cast<Element>().ToList();
+
+            //List<Element> selectedElements = uidoc.Selection.PickElementsByRectangle().ToList();
+            foreach (Element selectedElement in selectedElements)
             {
                 try
                 {
-                    Debug.WriteLine($"element is {family.Name}");
-                    Category familyCategory = family.Category;
-                    Options options = new Options();
-                    //{
-                    //    IncludeNonVisibleObjects = true
-                    //};
+                    Category selectedElementCategory = selectedElement.Category;
+                    //Debug.WriteLine($"element category is {selectedElementCategory.Name} ");
+                    Options options = new Options()
+                    {
+                        DetailLevel = ViewDetailLevel.Fine,
+                        IncludeNonVisibleObjects = true,
+                        ComputeReferences = true
+                    };
 
-                    var solids = family.get_Geometry(options)
+
+                    var solids = selectedElement.get_Geometry(options)
                         .OfType<GeometryInstance>()
-                        .SelectMany(g => g.GetInstanceGeometry())
+                        .SelectMany(g => g.GetInstanceGeometry().OfType<Solid>()
+                        .Where(s => s.Volume > 0))
                         .ToList();
 
-                    Debug.WriteLine($"element category is {familyCategory.Name} with {solids.Count} solids");
+
                     foreach (var solid in solids)
                     {
                         ElementId eid = solid.GraphicsStyleId;
@@ -74,27 +70,81 @@ namespace ProjectSweeper.RevitFunctions
                         {
                             //Category category = gs.GraphicsStyleCategory;
                             //Category parentCategory = gs.GraphicsStyleCategory;
-                            string categoryNameCombined = $"{family.Name} : {gs.Name}";
-                            Debug.WriteLine($"{family.Id} : {gs.Id}");
+                            string categoryNameCombined = $"{selectedElementCategory.Name} : {gs.Name}";
 
                             IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == categoryNameCombined);
                             if (objectStyle != null)
                             {
-                                Debug.WriteLine($"Selected category {objectStyle.Name} - {objectStyle.Id}");
                                 objectStyle.IsUsed = true;
                             }
+                            //Debug.WriteLine($"+++ {objectStyle.Name} - {objectStyle.Id}");
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
 
                 }
             }
         }
 
+        private static void SetUsedObjectStylesImportInstance(Document doc, ISet<ObjectStyleModel> objectStyleList)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<ImportInstance> selectedElements = collector.WhereElementIsNotElementType().OfType<ImportInstance>().ToList();
+
+            foreach (ImportInstance selectedElement in selectedElements)
+            {
+                try
+                {
+                    Category selectedElementCategory = selectedElement.Category;
+                    Options options = new Options()
+                    {
+                        DetailLevel = ViewDetailLevel.Fine,
+                        IncludeNonVisibleObjects = true,
+                        ComputeReferences = true
+                    };
+
+                    var importCurves = selectedElement.get_Geometry(options)
+                        .OfType<GeometryInstance>()
+                        .SelectMany(g => g.GetInstanceGeometry().OfType<Curve>())
+                        .ToList();
+
+                    var importCurveStyles = new HashSet<string>(
+                        importCurves
+                            .Select(curve =>
+                            {
+                                ElementId eid = curve.GraphicsStyleId;
+                                GraphicsStyle gs = doc.GetElement(eid) as GraphicsStyle;
+                                return $"{selectedElementCategory.Name} : {gs?.GraphicsStyleCategory?.Name}";
+                            })
+                    );
+
+                    foreach (string curveStyle in importCurveStyles)
+                    {
+                        IElement objectStyle = objectStyleList.FirstOrDefault(os => os.Name == curveStyle);
+                        if (objectStyle != null)
+                        {
+                            objectStyle.IsUsed = true;
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            Debug.WriteLine("USED STYLES");
+            foreach (var os in objectStyleList.Where(os => os.IsUsed).ToList())
+            {
+                Debug.WriteLine(os.Name);
+            }
+        }
 
 
+        //LEGACY
         private static void SetUsedObjectStyles(Document doc, ISet<ObjectStyleModel> objectStyleList)
         {
 
@@ -125,13 +175,11 @@ namespace ProjectSweeper.RevitFunctions
                     }
 
                     //ElementCategoryFilter(builtInCategory);
-
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"error occured for {builtInCategory}");
                 }
-
             }
             Debug.WriteLine($"end function");
         }
@@ -160,7 +208,6 @@ namespace ProjectSweeper.RevitFunctions
 
             var parentCategory = famDoc.Settings.Categories.Cast<Category>().First(q => q.Id == categoryId);
             var subcategories = parentCategory.SubCategories.Cast<Category>();
-
 
 
             ISet<string> usedSubcategories = new HashSet<string>();

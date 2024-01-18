@@ -32,6 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="eTransmitForRevit">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\eTransmit for Revit 2022\eTransmitForRevit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="eTransmitForRevitDB">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\eTransmit for Revit 2022\eTransmitForRevitDB.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.1\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -82,8 +90,8 @@
       <DependentUpon>NavigationBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BooleanToTextConverter.cs" />
-    <Compile Include="Converters\IsUsedToColorConverter.cs" />
     <Compile Include="Converters\IsUsedToColorMultiValueConverter.cs" />
+    <Compile Include="Models\MaterialAppearanceAssetModel.cs" />
     <Compile Include="Models\Cleaner.cs" />
     <Compile Include="Models\ElementModelList.cs" />
     <Compile Include="Models\FilledRegionModel.cs" />
@@ -93,12 +101,15 @@
     <Compile Include="Models\IModelList.cs" />
     <Compile Include="Models\LinePatternModel.cs" />
     <Compile Include="Models\LineStyleModel.cs" />
+    <Compile Include="Models\MaterialModel.cs" />
     <Compile Include="Models\ModelTypes.cs" />
     <Compile Include="Models\ObjectStyleModel.cs" />
     <Compile Include="Models\TextTypeModel.cs" />
     <Compile Include="Models\ViewportModel.cs" />
     <Compile Include="Models\ViewTemplateModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurgeUnusedCommand.cs" />
+    <Compile Include="RevitFunctions\MaterialFunctions.cs" />
     <Compile Include="RevitFunctions\DocumentFunctions.cs" />
     <Compile Include="RevitFunctions\FilledRegionFunctions.cs" />
     <Compile Include="RevitFunctions\FillPatternFunctions.cs" />

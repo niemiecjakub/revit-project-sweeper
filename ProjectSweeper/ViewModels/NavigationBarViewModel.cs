@@ -22,6 +22,8 @@ namespace ProjectSweeper.ViewModels
         public ICommand ViewportNavigationCommand { get; }
         public ICommand TextNavigationCommand { get; }
         public ICommand ObjectStyleNavigationCommand { get; }
+        public ICommand MaterialNavigationCommand { get; }
+        public ICommand MaterialAppearanceAssetNavigationCommand { get; }
         public NavigationBarViewModel(INavigationService lineStyleNavigation, 
             INavigationService linePatternNavigation, 
             INavigationService filledRegionNavigation, 
@@ -30,7 +32,9 @@ namespace ProjectSweeper.ViewModels
             INavigationService viewTemplateNavigation,
             INavigationService viewportNavigation,
             INavigationService textNavigation,
-            INavigationService objectStyleNavigation)
+            INavigationService objectStyleNavigation,
+            INavigationService materialNavigation,
+            INavigationService materialAppearanceAssetNavigation)
         
         {
             lineStyleNavigaitonCommand = new NavigateCommand(lineStyleNavigation);
@@ -44,6 +48,9 @@ namespace ProjectSweeper.ViewModels
 
             TextNavigationCommand = new NavigateCommand(textNavigation);
             ObjectStyleNavigationCommand = new NavigateCommand(objectStyleNavigation);
+
+            MaterialNavigationCommand = new NavigateCommand(materialNavigation);
+            MaterialAppearanceAssetNavigationCommand = new NavigateCommand(materialAppearanceAssetNavigation);
         }
     }
 }

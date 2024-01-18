@@ -1,13 +1,9 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using ProjectSweeper.Models;
 using ProjectSweeper.RevitFunctions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectSweeper.Services.ElementProvider
@@ -52,6 +48,12 @@ namespace ProjectSweeper.Services.ElementProvider
 
                 case ModelTypes.ObjectStyle:
                     return ObjectStyleFunctions.GetAllObjectStyles(_doc);
+
+                case ModelTypes.Material:
+                    return MaterialFunctions.GetAllMaterials(_doc);
+
+                case ModelTypes.MaterialAppearanceAsset:
+                    return MaterialFunctions.GetAllMaterialAppearances(_doc);
 
                 default:
                     throw new NotImplementedException();

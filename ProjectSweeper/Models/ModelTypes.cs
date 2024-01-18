@@ -16,6 +16,8 @@ namespace ProjectSweeper.Models
         Viewport,
         Filter,
         ViewTemplate,
-        ObjectStyle
+        ObjectStyle,
+        Material,
+        MaterialAppearanceAsset
     }
 }

@@ -10,7 +10,6 @@
     <UserControl.Resources>
         <converters:IsUsedToColorMultiValueConverter x:Key="IsUsedToColorMultiValueConverter" />
         <converters:BooleanToTextConverter x:Key="BooleanToTextConverter"/>
-
         <Style x:Key="PropertyValueToColor" TargetType="TextBlock">
             <Setter Property="Foreground">
                 <Setter.Value>
@@ -21,11 +20,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </UserControl.Resources>
 
     <Grid >
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width=".65*"/>
             <ColumnDefinition Width=".35*"/>

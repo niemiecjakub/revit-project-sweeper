@@ -81,6 +81,7 @@
     <Compile Include="Components\NavigationBar.xaml.cs">
       <DependentUpon>NavigationBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToTextConverter.cs" />
     <Compile Include="Converters\IsUsedToColorConverter.cs" />
     <Compile Include="Converters\IsUsedToColorMultiValueConverter.cs" />
     <Compile Include="Models\Cleaner.cs" />

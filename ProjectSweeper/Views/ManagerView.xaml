@@ -6,12 +6,12 @@
              xmlns:local="clr-namespace:ProjectSweeper.Views"
              xmlns:converters="clr-namespace:ProjectSweeper.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="400" d:DesignWidth="900">
     <UserControl.Resources>
-        <converters:IsUsedToColorConverter x:Key="IsUsedToColorConverter" />
         <converters:IsUsedToColorMultiValueConverter x:Key="IsUsedToColorMultiValueConverter" />
-        
-        <Style x:Key="TextBlockStyle" TargetType="TextBlock">
+        <converters:BooleanToTextConverter x:Key="BooleanToTextConverter"/>
+
+        <Style x:Key="PropertyValueToColor" TargetType="TextBlock">
             <Setter Property="Foreground">
                 <Setter.Value>
                     <MultiBinding Converter="{StaticResource IsUsedToColorMultiValueConverter}">
@@ -24,32 +24,78 @@
 
     </UserControl.Resources>
 
-    <Grid Background="DarkKhaki">
+    <Grid >
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width=".65*"/>
+            <ColumnDefinition Width=".35*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height=".1*"/>
-            <RowDefinition />
-            <RowDefinition Height=".1*"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"  Text="{Binding Name}" VerticalAlignment="Center" FontSize="24"/>
 
-        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Name}"/>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height=".1*"/>
+            </Grid.RowDefinitions>
+            <ListView Grid.Row="0" ItemsSource="{Binding Elements}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" Width="270">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource PropertyValueToColor}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-        <ListView Grid.Column="1"  Grid.Row="1" ItemsSource="{Binding Elements}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel>
-                        <!--<TextBlock Text="{Binding Name}" Foreground="{Binding IsUsed, Converter={StaticResource IsUsedToColorConverter}}" />-->
-                        <TextBlock Text="{Binding Name}" Style="{StaticResource TextBlockStyle}"/>
+                        <GridViewColumn Header="Id" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Id}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                        <TextBlock Text="         "/>
-                        <TextBlock Text="{Binding Id.IntegerValue}"/>
-                    </WrapPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                        <GridViewColumn Header="Is Used" Width="80">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding IsUsed , Converter={StaticResource BooleanToTextConverter}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-        <StackPanel Grid.Column="1"  Grid.Row="2">
-            <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}" Height="40px"/>
-        </StackPanel>
+                        <GridViewColumn Header="Deletable" Width="80">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CanBeRemoved, Converter={StaticResource BooleanToTextConverter}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <StackPanel Grid.Row="2">
+                <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}" Height="50"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="1">
+            <StackPanel>
+                <TextBlock Text="LEGEND" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Text="This is built-in element and cannot be deleted" Foreground="Yellow" />
+                <TextBlock Text="" />
+                <TextBlock Text="This elemen is not used in the project and can be deleted" Foreground="Red" />
+                <TextBlock Text="" />
+                <TextBlock Text="This elemen is used in the project and cannot be deleted" Foreground="Black" />
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </UserControl>

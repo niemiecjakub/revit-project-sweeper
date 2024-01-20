@@ -21,7 +21,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (ParameterFilterElement filter in filters)
             {
                 FilterModel filterModel = new FilterModel(filter);
-                filterModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, filter.Id);
+                filterModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, filter.Id);
                 filterModelList.Add(filterModel);
             }
 

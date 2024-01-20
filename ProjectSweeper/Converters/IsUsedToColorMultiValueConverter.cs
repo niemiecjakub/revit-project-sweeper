@@ -22,7 +22,6 @@ namespace ProjectSweeper.Converters
                 return Brushes.Black;
             }
             return Brushes.Red;
-
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

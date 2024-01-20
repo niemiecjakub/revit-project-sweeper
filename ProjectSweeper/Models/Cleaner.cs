@@ -14,8 +14,7 @@ namespace ProjectSweeper.Models
         {
             _elementModelList = elementModelList;
         }
-
-        public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
+                public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
         {
             return await _elementModelList.GetAllElements(modelType);
         }

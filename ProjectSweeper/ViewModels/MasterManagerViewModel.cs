@@ -74,7 +74,6 @@ namespace ProjectSweeper.ViewModels
         public static MasterManagerViewModel LoadViewModel(CleanerStore cleanerStore, ModelTypes modelType)
         {
             MasterManagerViewModel viewModel = new MasterManagerViewModel(cleanerStore, modelType);
-            Console.WriteLine($"INITIALIZED WITH {modelType}");
             viewModel.LoadElementsCommand.Execute(null);
             return viewModel;
         }

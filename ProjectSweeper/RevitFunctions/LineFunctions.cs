@@ -22,7 +22,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (Category lineStyle in subcats)
             {
                 LineStyleModel style = new LineStyleModel(lineStyle);
-                style.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, lineStyle.Id); ;
+                style.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, lineStyle.Id); ;
                 lineStyles.Add(style);
             }
 
@@ -67,7 +67,7 @@ namespace ProjectSweeper.RevitFunctions
                 if (linePattern is LinePatternElement lpe)
                 {
                     LinePatternModel lpm = new LinePatternModel(lpe);
-                    lpm.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, linePattern.Id); ;
+                    lpm.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, linePattern.Id); ;
                     linePatterns.Add(lpm);
                 }
             }

@@ -24,7 +24,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (FillPatternElement pattern in patterns)
             {
                 FillPatternModel fillPatternModel = new FillPatternModel(pattern);
-                fillPatternModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, pattern.Id);
+                fillPatternModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, pattern.Id);
                 patternsList.Add(fillPatternModel);
             }
 

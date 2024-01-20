@@ -19,7 +19,7 @@ namespace ProjectSweeper.RevitFunctions
             {
                 if (viewportType.FamilyName != "Viewport") { continue; }
                 ViewportModel viewportModel = new ViewportModel(viewportType);
-                viewportModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, viewportType.Id);
+                viewportModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, viewportType.Id);
                 viewportModelList.Add(viewportModel);
             }
 

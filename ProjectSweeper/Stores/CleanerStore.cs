@@ -18,7 +18,6 @@ namespace ProjectSweeper.Stores
         private readonly Dictionary<ModelTypes, Lazy<Task<IEnumerable<IElement>>>> _lazyInitializationTasks;
         private Dictionary<ModelTypes, List<IElement>> _elementCollections;
 
-
         public event Action<IEnumerable<IElement>> ElementDeleted;
 
         public CleanerStore(Cleaner cleaner, Document doc)
@@ -43,7 +42,6 @@ namespace ProjectSweeper.Stores
 
         private async Task InitializeElementCollection(ModelTypes modelType)
         {
-            Debug.WriteLine($"Initializing lazy {modelType}s");
             IEnumerable<IElement> elements = await _lazyInitializationTasks[modelType].Value;
             IEnumerable<IElement> validElements = elements.Where(e =>
             {
@@ -60,23 +58,17 @@ namespace ProjectSweeper.Stores
 
         public void DeleteElements(ModelTypes modelType)
         {
-            Debug.WriteLine("STORE:");
-
             IEnumerable<IElement> elementsToBeDeleted = _elementCollections[modelType].Where(x => !x.IsUsed && x.CanBeRemoved);
             if (elementsToBeDeleted.Count() == 0)
             {
-                Debug.WriteLine("Nothing to delete");
                 return;
             }
 
-            Debug.WriteLine($"{_elementCollections[modelType].Count} elements");
+            Debug.WriteLine($"{_elementCollections[modelType].Count} elements in total");
             Debug.WriteLine($"{elementsToBeDeleted.Count()} elements to be deleted");
 
             _cleaner.DeleteElements(elementsToBeDeleted);
-
             _elementCollections[modelType].RemoveAll(element => elementsToBeDeleted.Contains(element));
-
-            Debug.WriteLine($"STORE: Left {_elementCollections[modelType].Count} {modelType}s");
 
             OnElementDeleted(_elementCollections[modelType]);
         }

@@ -21,7 +21,7 @@ namespace ProjectSweeper.RevitFunctions
             {
                 if (!view.IsTemplate) { continue; }
                 ViewTemplateModel viewTemplateModel = new ViewTemplateModel(view);
-                viewTemplateModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, view.Id);
+                viewTemplateModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, view.Id);
                 viewTemplateModelList.Add(viewTemplateModel);
             }
 

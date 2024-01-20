@@ -19,7 +19,6 @@ namespace ProjectSweeper.Commands
 
         public override void Execute(object parameter)
         {
-            Debug.WriteLine("click");
             _navigationService.Navigate();
         }
     }

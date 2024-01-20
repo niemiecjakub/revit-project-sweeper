@@ -19,8 +19,7 @@ namespace ProjectSweeper.Models
             _elementProvider = filledRegionProvider;
             _elementRemover = elementRemover;
         }
-
-        public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
+                public async Task<IEnumerable<IElement>> GetAllElements(ModelTypes modelType)
         {
             return await _elementProvider.GetAllElements(modelType);
         }

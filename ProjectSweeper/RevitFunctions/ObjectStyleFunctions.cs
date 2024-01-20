@@ -22,7 +22,7 @@ namespace ProjectSweeper.RevitFunctions
                     string name = $"{category.Name} : {subcategory.Name}";
                     ElementId id = subcategory.Id;
                     ObjectStyleModel objectStyleModel = new ObjectStyleModel(name, id);
-                    objectStyleModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, subcategory.Id);
+                    objectStyleModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, subcategory.Id);
                     objectStyleList.Add(objectStyleModel);
                 }
             }

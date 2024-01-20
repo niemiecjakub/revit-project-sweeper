@@ -14,11 +14,9 @@ namespace ProjectSweeper.Models
         public bool IsUsed { get; set; }
         public bool CanBeRemoved {  get; set; }
         public ElementId PatternId { get; set; }
-
         public int? LineWeight { get; set; }
         public Color Color { get; set; }
         public ModelTypes ModelType { get; set; } = ModelTypes.LineStyle;
-
 
         public LineStyleModel(string name, ElementId id, ElementId patternId, int? lineWeight, Color color)
         {
@@ -37,7 +35,6 @@ namespace ProjectSweeper.Models
             LineWeight = lineStyle.GetLineWeight(GraphicsStyleType.Projection);
             Color = lineStyle.LineColor;
         }
-
 
         public LinePatternElement GetLinePattern(Document doc)
         {

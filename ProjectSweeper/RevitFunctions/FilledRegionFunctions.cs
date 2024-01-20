@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -23,7 +24,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (FilledRegionType filledRegion in filledRegions)
             {
                 FilledRegionModel filledRegionModel = new FilledRegionModel(filledRegion);
-                filledRegionModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, filledRegion.Id);
+                filledRegionModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, filledRegion.Id);
                 filledRegionsList.Add(filledRegionModel);
             }
 

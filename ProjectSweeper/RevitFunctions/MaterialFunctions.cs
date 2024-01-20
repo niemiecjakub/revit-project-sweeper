@@ -24,7 +24,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (Material material in materials)
             {
                 MaterialModel materialModel = new MaterialModel(material);
-                materialModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, material.Id);
+                materialModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, material.Id);
                 materialList.Add(materialModel);
             }
 
@@ -42,7 +42,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (AppearanceAssetElement asset in appearanceAssets)
             {
                 MaterialAppearanceAssetModel assetModel = new MaterialAppearanceAssetModel(asset);
-                assetModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, asset.Id);
+                assetModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, asset.Id);
                 appearanceAssetList.Add(assetModel);
             }
 

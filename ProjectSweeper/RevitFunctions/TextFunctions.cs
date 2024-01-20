@@ -22,7 +22,7 @@ namespace ProjectSweeper.RevitFunctions
             foreach (TextNoteType textNoteType in textNoteTypes)
             {
                 TextTypeModel textModel = new TextTypeModel(textNoteType);
-                textModel.CanBeRemoved = DocumentFunctions.CanBeRemoved(doc, textNoteType.Id);
+                textModel.CanBeRemoved = DocumentValidation.CanDeleteElement(doc, textNoteType.Id);
                 textModelList.Add(textModel);
             }
 

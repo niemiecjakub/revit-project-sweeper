@@ -15,7 +15,7 @@ namespace ProjectSweeper.Converters
         {
             if (values[0] is bool CanBeDeleted && !CanBeDeleted)
             {
-                return Brushes.Yellow;
+                return Brushes.Green;
             }
             if (values[1] is bool isUsed && isUsed)
             {

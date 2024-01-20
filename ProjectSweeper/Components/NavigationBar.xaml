@@ -6,13 +6,7 @@
              xmlns:local="clr-namespace:ProjectSweeper.Components"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="4" />
-            <Setter Property="Padding" Value="10" />
-        </Style>
-    </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" Height="50px">
+    <StackPanel Orientation="Vertical" >
         <Button Content="LINE STYLE" Command="{Binding lineStyleNavigaitonCommand}"/>
         <Button Content="LINE PATTERN" Command="{Binding linePatternNavigationCommand}"/>
         <Button Content="FILLED REGION" Command="{Binding FilledRegionNavigationComand}"/>

@@ -4,21 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ProjectSweeper.Components"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+              d:DesignHeight="550" d:DesignWidth="900">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width=".25*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0" Background="#86B6F6">
+        <Grid Grid.Column="0" Background="#86B6F6">
             <local:NavigationBar DataContext="{Binding NavigationBarViewModel}"/>
         </Grid>
 
-        <Grid Grid.Row="1" Background="#B4D4FF">
+        <Grid Grid.Column="1" Background="White">
             <ContentControl Content="{Binding ContentViewModel}" />
         </Grid>
-
     </Grid>
 </UserControl>

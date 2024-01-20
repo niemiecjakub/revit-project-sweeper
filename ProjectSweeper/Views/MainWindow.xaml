@@ -7,7 +7,15 @@
         xmlns:local="clr-namespace:ProjectSweeper.Views"
         xmlns:components="clr-namespace:ProjectSweeper.Components"
         mc:Ignorable="d"
-        Title="Project sweeper" Height="800" Width="900">
+         ResizeMode="NoResize"
+        Title="Project sweeper" Height="550" Width="700">
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.Resources>
             <DataTemplate DataType="{x:Type vms:LayoutViewModel}">

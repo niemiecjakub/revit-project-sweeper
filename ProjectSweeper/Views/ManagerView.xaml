@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ProjectSweeper.Views"
              xmlns:converters="clr-namespace:ProjectSweeper.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="900">
+             d:DesignHeight="550" d:DesignWidth="740">
     <UserControl.Resources>
         <converters:IsUsedToColorMultiValueConverter x:Key="IsUsedToColorMultiValueConverter" />
         <converters:BooleanToTextConverter x:Key="BooleanToTextConverter"/>
@@ -22,27 +22,57 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid >
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width=".65*"/>
-            <ColumnDefinition Width=".35*"/>
-        </Grid.ColumnDefinitions>
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height=".1*"/>
-            <RowDefinition/>
+            <RowDefinition />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"  Text="{Binding Name}" VerticalAlignment="Center" FontSize="24"/>
+        <Grid Grid.Row="0" Background="#86B6F6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width=".5*"/>
+                <ColumnDefinition Width=".5*"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid Grid.Column="0">
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding TotalElementsCount}" FontWeight="Bold"/>
+                        <TextBlock Text=" - Total elements" FontWeight="Bold"/>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding UnusedElementsCount}" FontWeight="Bold"/>
+                        <TextBlock Text=" - Unused elements" FontWeight="Bold"/>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding ToBeDeletedElementsCount}" FontWeight="Bold"/>
+                        <TextBlock Text=" - To be deleted elements" FontWeight="Bold"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <StackPanel>
+                    <TextBlock>
+                        <Run Text="This element is used" Foreground="Black" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="This element is built-in (cannot be deleted)" Foreground="Green" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="This element is unused (can be deleted)" Foreground="red" FontWeight="Bold"/>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition />
-                <RowDefinition Height=".1*"/>
+                <RowDefinition Height=".15*"/>
             </Grid.RowDefinitions>
-            <ListView Grid.Row="0" ItemsSource="{Binding Elements}">
+            <ListView ItemsSource="{Binding Elements}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Name" Width="270">
+                        <GridViewColumn Header="Name" Width="250">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource PropertyValueToColor}"/>
@@ -78,21 +108,9 @@
                 </ListView.View>
             </ListView>
 
-            <StackPanel Grid.Row="2">
-                <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}" Height="50"/>
+            <StackPanel Grid.Row="1"  Background="#B4D4FF">
+                <Button Content="DELETE UNUSED" Command="{Binding RemoveUnusedElementsCommand}" Height="50" />
             </StackPanel>
         </Grid>
-
-        <Grid Grid.Column="1" Grid.Row="1">
-            <StackPanel>
-                <TextBlock Text="LEGEND" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Text="This is built-in element and cannot be deleted" Foreground="Yellow" />
-                <TextBlock Text="" />
-                <TextBlock Text="This elemen is not used in the project and can be deleted" Foreground="Red" />
-                <TextBlock Text="" />
-                <TextBlock Text="This elemen is used in the project and cannot be deleted" Foreground="Black" />
-            </StackPanel>
-        </Grid>
-
     </Grid>
 </UserControl>

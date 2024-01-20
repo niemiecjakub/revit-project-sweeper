@@ -23,7 +23,6 @@ namespace ProjectSweeper.ViewModels
             set
             {
                 _elements = value;
-
                 OnPropertyChanged(nameof(Elements));
             }
         }
@@ -38,6 +37,10 @@ namespace ProjectSweeper.ViewModels
                 OnPropertyChanged(nameof(IsLoading));
             }
         }
+
+        public string TotalElementsCount => _elements.Count.ToString();
+        public string UnusedElementsCount => _elements.Where(e => !e.IsUsed).ToList().Count().ToString();
+        public string ToBeDeletedElementsCount => _elements.Where(e => !e.IsUsed && e.CanBeRemoved).ToList().Count().ToString();
         public ICommand RemoveUnusedElementsCommand { get; }
         public ICommand LoadElementsCommand { get; }
         public MasterManagerViewModel(CleanerStore cleanerStore, ModelTypes modelType)
@@ -69,6 +72,9 @@ namespace ProjectSweeper.ViewModels
             }
             _elements = elements;
             OnPropertyChanged(nameof(Elements));
+            OnPropertyChanged(nameof(TotalElementsCount));
+            OnPropertyChanged(nameof(UnusedElementsCount));
+            OnPropertyChanged(nameof(ToBeDeletedElementsCount));
         }
 
         public static MasterManagerViewModel LoadViewModel(CleanerStore cleanerStore, ModelTypes modelType)

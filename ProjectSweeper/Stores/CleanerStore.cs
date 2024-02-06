@@ -67,7 +67,15 @@ namespace ProjectSweeper.Stores
             Debug.WriteLine($"{_elementCollections[modelType].Count} elements in total");
             Debug.WriteLine($"{elementsToBeDeleted.Count()} elements to be deleted");
 
-            _cleaner.DeleteElements(elementsToBeDeleted);
+            if (modelType == ModelTypes.ObjectStyle)
+            {
+                Task.Delay(25 * 1000).Wait();
+            }
+            else
+            {
+                _cleaner.DeleteElements(elementsToBeDeleted);
+
+            }
             _elementCollections[modelType].RemoveAll(element => elementsToBeDeleted.Contains(element));
 
             OnElementDeleted(_elementCollections[modelType]);

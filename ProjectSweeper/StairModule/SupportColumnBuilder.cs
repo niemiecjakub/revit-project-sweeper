@@ -21,7 +21,7 @@ namespace ProjectSweeper.StairModule
 
             BasePoint projectBasePoint = basePointCollector.Cast<BasePoint>().FirstOrDefault();
             double projectBasePointElevation = projectBasePoint.Position.Z;
-            Debug.WriteLine("PBP: " + Utils.FeetToMMConverter(projectBasePointElevation));
+            //Debug.WriteLine("PBP: " + Utils.FeetToMMConverter(projectBasePointElevation));
 
             Parameter baseOffset = column.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
             Parameter topOffset = column.get_Parameter(BuiltInParameter.FAMILY_TOP_LEVEL_OFFSET_PARAM);

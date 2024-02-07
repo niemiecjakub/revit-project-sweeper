@@ -107,6 +107,13 @@ namespace ProjectSweeper.StairModule
             return Line.CreateBound(startPoint, endPoint);
         }
 
+        public static Line LineOffsetVerically(Line lineToOffset, double distance)
+        {
+            XYZ startPoint = OffsetZValueXYZ(lineToOffset.GetEndPoint(0), distance);
+            XYZ endPoint = OffsetZValueXYZ(lineToOffset.GetEndPoint(1), distance);
+            return Line.CreateBound(startPoint, endPoint);
+        }
+
 
         public static XYZ GetTangentVector(Line line)
         {

@@ -128,8 +128,12 @@
     <Compile Include="Services\INavigationService.cs" />
     <Compile Include="Services\LayoutNavigationService.cs" />
     <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="StairModule\BeamBraceBuilder.cs" />
+    <Compile Include="StairModule\FloorFilter.cs" />
+    <Compile Include="StairModule\FloorSelection.cs" />
     <Compile Include="StairModule\HorizontalBeamBuilder.cs" />
     <Compile Include="StairModule\Main.cs" />
+    <Compile Include="StairModule\MainByFloorSelection.cs" />
     <Compile Include="StairModule\SlantedColumnBuilder.cs" />
     <Compile Include="StairModule\StairModuleUI.cs">
       <SubType>Form</SubType>

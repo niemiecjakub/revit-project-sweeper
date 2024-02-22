@@ -9,6 +9,31 @@ namespace ProjectSweeper.StairModule
 {
     public class Utils
     {
+        public static Line Reverse(Line line)
+        {
+            XYZ startPoint = line.GetEndPoint(0);
+            XYZ endPoint = line.GetEndPoint(1);
+            return Line.CreateBound(endPoint, startPoint);
+        }
+        public static string GetStairCode(Parameter walkwayOrientation, Parameter walkwayPurpose)
+        {
+            string orientation = walkwayOrientation.AsString() == "S" ? "S" : "N";
+            string purpose = walkwayPurpose.AsString() == "Emergency" ? "E" : "M";
+            return $"{orientation}T{purpose}L";
+        }
+        public static string ToNumberingFormat(int i)
+        {
+            if (i < 10)
+            {
+                return $"00{i}";
+            }
+            if (i < 100)
+            {
+                return $"0{i}";
+            }
+            return $"{i}";
+        }
+
         public static double MMToFeetConverter(double value)
         {
             return value / 304.8;

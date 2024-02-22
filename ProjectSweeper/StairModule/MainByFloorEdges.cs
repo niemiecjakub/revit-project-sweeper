@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace ProjectSweeper.StairModule
 {
     [Transaction(TransactionMode.Manual)]
-    public class Main : IExternalCommand
+    public class MainByFloorEdges : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {

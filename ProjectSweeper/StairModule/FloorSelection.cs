@@ -20,6 +20,46 @@ namespace ProjectSweeper.StairModule
             _uidoc = uidoc;
             _doc = doc;
         }
+
+        public List<Curve> GetFarToAlignmentCurveBySelection(IList<Element> floorList, Reference selectedAlignment)
+        {
+            Options options = new Options();
+            HermiteSpline alignmentSpline = GetSplineFromAlignment(selectedAlignment, options);
+
+            List<Curve> floorCurves = new List<Curve>();
+            foreach (Floor floor in floorList)
+            {
+                GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+                foreach (GeometryObject geometryObject in floorgGeometryElements)
+                {
+                    if (geometryObject is Solid solid)
+                    {
+                        foreach (Face face in solid.Faces)
+                        {
+                            if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                            {
+                                foreach (EdgeArray edges in face.EdgeLoops)
+                                {
+                                    List<Curve> faceCurves = new List<Curve>();
+                                    foreach (Edge edge in edges)
+                                    {
+                                        Curve edgeCurve = edge.AsCurve();
+                                        faceCurves.Add(edgeCurve);
+                                    }
+
+                                    List<Curve> longestCurves = faceCurves.OrderByDescending(curve => curve.Length).Take(2).ToList();
+                                    Curve hostFloorEgde = longestCurves.OrderByDescending(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true))).FirstOrDefault();
+                                    floorCurves.Add(hostFloorEgde);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
+        }
+
+
         public List<Curve> GetClosesToAlignmentCurveBySelection(IList<Element> floorList, Reference selectedAlignment)
         {
             Options options = new Options();
@@ -58,7 +98,7 @@ namespace ProjectSweeper.StairModule
             return floorCurves;
         }
 
-        public List<Curve> GetFloorLongestLines(IList<Element> floorList, Reference selectedAlignment) 
+        public List<Curve> GetFloorSideLines(IList<Element> floorList, Reference selectedAlignment)
         {
             Options options = new Options();
             HermiteSpline alignmentSpline = GetSplineFromAlignment(selectedAlignment, options);
@@ -83,9 +123,14 @@ namespace ProjectSweeper.StairModule
                                         faceCurves.Add(edgeCurve);
                                     }
 
-                                    List<Curve> longestCurves = faceCurves.OrderByDescending(curve => curve.Length).Take(2).ToList();
-                                    longestCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true)));
-                                    longestCurves.ForEach(curve => floorCurves.Add(curve));
+                                    List<Curve> longestCurves = faceCurves.OrderByDescending(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true))).ToList();
+                                    floorCurves.Add(longestCurves[0]);
+                                    floorCurves.Add(longestCurves[longestCurves.Count - 1]);
+                                    floorCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true)));
+
+                                    //List<Curve> longestCurves = faceCurves.OrderByDescending(curve => curve.Length).Take(2).ToList();
+                                    //longestCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true)));
+                                    //longestCurves.ForEach(curve => floorCurves.Add(curve));
                                 }
                             }
                         }
@@ -116,6 +161,53 @@ namespace ProjectSweeper.StairModule
             }
 
             return alignmentSpline;
+        }
+
+
+        public Curve GetFloorLongestCurve(Floor floor)
+        {
+            Options options = new Options();
+            Curve longestCurve = null;
+
+            GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    faceCurves.Add(edgeCurve);
+                                }
+
+                                longestCurve = faceCurves.OrderByDescending(curve => curve.Length).FirstOrDefault();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return longestCurve;
+        }
+
+        public double GetFloorLongestCurveLength(Floor floor)
+        {
+            Line landingLengthCurve = GetFloorLongestCurve(floor) as Line;
+            return landingLengthCurve.Length;
+
+        }
+
+        public XYZ GetFloorAproxLocation(Floor floor)
+        {
+            Line landingLengthCurve = GetFloorLongestCurve(floor) as Line;
+            return landingLengthCurve.Evaluate(0.5, true);
         }
     }
 }

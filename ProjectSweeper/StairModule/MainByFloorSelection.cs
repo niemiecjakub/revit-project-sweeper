@@ -31,16 +31,15 @@ namespace ProjectSweeper.StairModule
                 Reference selectedAlignment;
                 try
                 {
-                    Selection selection = uidoc.Selection;
                     //floors
                     ISelectionFilter floorFilter = new FloorFilter();
                     floorList = uidoc.Selection.PickElementsByRectangle(floorFilter, "Select floors");
                     //alignment
                     selectedAlignment = uidoc.Selection.PickObject(ObjectType.Element, "Select alignment");
                     //tunnel
-                    pickedTunnel = selection.PickObject(ObjectType.Element, "Select an element");
+                    pickedTunnel = uidoc.Selection.PickObject(ObjectType.Element, "Select an element");
                     //salab
-                    pickedSlab = selection.PickObject(ObjectType.Element, "Select slab");
+                    pickedSlab = uidoc.Selection.PickObject(ObjectType.Element, "Select slab");
                 }
                 catch (Autodesk.Revit.Exceptions.OperationCanceledException)
                 {
@@ -103,28 +102,6 @@ namespace ProjectSweeper.StairModule
 
                         }
                     }
-
-                    // BRACE SLANTED COLUMN BUILDER
-                    //string FAMILY_SYMBOL_NAME_BRACE = "BRACE_RK50X5";
-                    //FamilySymbol braceFamilySymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_NAME_BRACE, BuiltInCategory.OST_StructuralColumns, doc);
-                    //for (int i = 0; i < columnPlacementlines.Count - 1; i++)
-                    //{
-                    //    XYZ basePoint = columnPlacementlines[i].GetEndPoint(i % 2 == 0 ? 1 : 0);
-                    //    XYZ topPoint = columnPlacementlines[i + 1].GetEndPoint(i % 2 == 0 ? 0 : 1);
-
-                    //    Line bracePlacementLine = Line.CreateBound(basePoint, topPoint);
-                    //    SketchPlane braceSketchPlane = Utils.CreateSketchPlaneByCurve(bracePlacementLine, doc);
-                    //    //doc.Create.NewModelCurve(bracePlacementLine, braceSketchPlane);
-
-                    //    if (i % 2 == 0)
-                    //    {
-                    //        SlantedColumnBuilder.CreateSlantedColumn(doc, topPoint, Utils.OffsetZValueXYZ(basePoint, Utils.MMToFeetConverter(70 - 25)), braceFamilySymbol);
-                    //    }
-                    //    else
-                    //    {
-                    //        SlantedColumnBuilder.CreateSlantedColumn(doc, basePoint, Utils.OffsetZValueXYZ(topPoint, Utils.MMToFeetConverter(70 - 25)), braceFamilySymbol);
-                    //    }
-                    //}
 
 
                     // BRACE FRAMING BUILDER
@@ -202,12 +179,12 @@ namespace ProjectSweeper.StairModule
                     }
                 }
 
-                List<Curve> floorLandingSideCurves = floorSelection.GetFloorLongestLines(floorList, selectedAlignment);
+
+                List<Curve> floorLandingSideCurves = floorSelection.GetFloorSideLines(floorList, selectedAlignment);
                 string FAMILY_SYMBOL_LANDING_SUPPORT_BEAM = "L40";
                 FamilySymbol landingSupportBeamSymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_LANDING_SUPPORT_BEAM, BuiltInCategory.OST_StructuralFraming, doc);
                 foreach (Curve landingCurve in floorLandingSideCurves)
                 {
-                    //ascending
                     Line profileLine = Utils.LineOffsetVerically(landingCurve as Line, Utils.MMToFeetConverter(-30));
                     //doc.Create.NewModelCurve(profileLine, Utils.CreateSketchPlaneByCurve(profileLine, doc));
 

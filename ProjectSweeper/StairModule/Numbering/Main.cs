@@ -25,11 +25,11 @@ namespace ProjectSweeper.StairModule.Numbering
                 .OfCategory(BuiltInCategory.OST_Floors)
                 .WhereElementIsNotElementType()
                 .Cast<Floor>()
-                .Where(f => f.Name.ToLower().Contains("stair"))
+                //.Where(f => f.Name.ToLower().Contains("LANDING"))
                 .OrderBy(f => floorSelection.GetFloorAproxLocation(f).X)
                 .ToList();
 
-
+            Debug.WriteLine(sortedFloors.Count);
             List<Element> sortedSteps = new FilteredElementCollector(doc, view.Id)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsNotElementType()
@@ -43,7 +43,7 @@ namespace ProjectSweeper.StairModule.Numbering
             using (Transaction transaction = new Transaction(doc, "Number landings"))
             {
                 transaction.Start();
-                int startNumber = 362;
+                int startNumber = 1;
                 SetFloorNumbering(sortedFloors, floorSelection, startNumber);
                 List<double> landingRanges = GetLandingRanges(sortedFloors, floorSelection, startNumber);
                 Dictionary<string, int> stairRunMap = MatchStairToLanding(0, sortedSteps, landingRanges);
@@ -51,7 +51,7 @@ namespace ProjectSweeper.StairModule.Numbering
 
                 foreach (var kv in stairRunMap)
                 {
-                    Debug.WriteLine($"{kv.Key} has {kv.Value} steps");
+                    //Debug.WriteLine($"{kv.Key} has {kv.Value} steps");
                 }
 
                 transaction.Commit();

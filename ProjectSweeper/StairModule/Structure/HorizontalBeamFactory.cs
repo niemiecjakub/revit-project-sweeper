@@ -61,6 +61,7 @@ namespace ProjectSweeper.StairModule.Structure
 
         public List<FamilyInstance> BuildAll(string side, Curve placementLine)
         {
+            List<FamilyInstance> builtElements = new List<FamilyInstance>();
             BeamXyzList = Utils.GetXYZlistFromCurve(placementLine, _maxSpacing);
             foreach (XYZ xyz in BeamXyzList)
             {
@@ -72,13 +73,14 @@ namespace ProjectSweeper.StairModule.Structure
                     {
                         FamilyInstance beamInstance = Build(beamLine, PlateRotation);
                         Beams.Add(beamInstance);
+                        builtElements.Add(beamInstance);
                     } catch (Exception e)
                     {
 
                     }
                 }
             }
-            return Beams;
+            return builtElements;
         }
 
         public FamilyInstance Build(Line beamPlacementLine, double plateRotation)
@@ -145,6 +147,54 @@ namespace ProjectSweeper.StairModule.Structure
                 GetPlateRotation(beamLine, tunnelSolid, plateOffset-10);
             }
             return 90 * (180.0 / Math.PI); ;
+        }
+
+
+        public List<FamilyInstance> BuildAllSwitch(string side, Curve placementLine)
+        {
+            BeamXyzList = GetXYZPoints(placementLine);
+            foreach (XYZ xyz in BeamXyzList)
+            {
+                Line verticalInfinityLine = Utils.CreateVerticalCurveFromXYZ(xyz, 2000);
+                Line beamLine = GetPlacementLine(side, xyz, placementLine, verticalInfinityLine);
+                if (beamLine.GetEndPoint(0).X != 0)
+                {
+                    try
+                    {
+                        FamilyInstance beamInstance = Build(beamLine, PlateRotation);
+                        Beams.Add(beamInstance);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+            }
+            return Beams;
+        }
+
+        public List<XYZ> GetXYZPoints(Curve edgeLine)
+        {
+            List<XYZ> xyzList = new List<XYZ>();
+
+            XYZ startXYZ = edgeLine.GetEndPoint(0);
+            XYZ endXYZ = edgeLine.GetEndPoint(1);
+            double lineLength = edgeLine.Length;
+            int segments = (int)Math.Floor(lineLength / _maxSpacing) + 1;
+            lineLength = Utils.FeetToMMConverter(lineLength);
+
+            List<double> divisions = Enumerable.Range(0, segments + 1).Select(i => (double)i / segments).ToList();
+            Debug.WriteLine(divisions.Count);
+            foreach (double division in divisions)
+            {
+                Debug.WriteLine(division.ToString());
+                XYZ p = edgeLine.Evaluate(division, true);
+                xyzList.Add(p);
+            }
+
+            Debug.WriteLine($"{lineLength} length");
+            Debug.WriteLine($"{segments} SEGMENTS");
+            return xyzList;
         }
     }
 }

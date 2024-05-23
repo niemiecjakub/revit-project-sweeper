@@ -26,16 +26,18 @@ namespace ProjectSweeper.StairModule.Structure
 
         public List<FamilyInstance> BuildAll()
         {
+            List<FamilyInstance> builtElements = new List<FamilyInstance>();
             for (int i = 0; i < _columnPlacementLines.Count - 1; i++)
             {
                 XYZ basePoint = _columnPlacementLines[i].GetEndPoint(i % 2 == 0 ? 1 : 0);
                 XYZ topPoint = _columnPlacementLines[i + 1].GetEndPoint(i % 2 == 0 ? 0 : 1);
 
                 Line placementLine = CreatePlacementLine(basePoint, topPoint);
-                Build(placementLine);
+                FamilyInstance brace =  Build(placementLine);
+                builtElements.Add(brace);
             }
 
-            return Braces;
+            return builtElements;
         }
 
         public FamilyInstance Build(Line bracePlacementLine)
@@ -48,8 +50,8 @@ namespace ProjectSweeper.StairModule.Structure
             Parameter lVoid = brace.LookupParameter("L_void_l");
             Parameter rVoid = brace.LookupParameter("R_void_l");
 
-            rVoid.Set(Utils.MMToFeetConverter(1));
-            lVoid.Set(Utils.MMToFeetConverter(1));
+            rVoid.Set(Utils.MMToFeetConverter(303.500));
+            lVoid.Set(Utils.MMToFeetConverter(303.500));
             zJustification.Set(2);
 
             Braces.Add(brace);

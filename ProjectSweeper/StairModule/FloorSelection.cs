@@ -59,6 +59,41 @@ namespace ProjectSweeper.StairModule
             return floorCurves;
         }
 
+        public List<Curve> GetFarToAlignmentCurveBySelection(Element floor, Reference selectedAlignment)
+        {
+            Options options = new Options();
+            HermiteSpline alignmentSpline = GetSplineFromAlignment(selectedAlignment, options);
+
+            List<Curve> floorCurves = new List<Curve>();
+
+            GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    faceCurves.Add(edgeCurve);
+                                }
+
+                                Curve hostFloorEgde = faceCurves.OrderByDescending(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true))).FirstOrDefault();
+                                floorCurves.Add(hostFloorEgde);
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
+        }
+
 
         public List<Curve> GetClosesToAlignmentCurveBySelection(IList<Element> floorList, Reference selectedAlignment)
         {
@@ -90,6 +125,39 @@ namespace ProjectSweeper.StairModule
                                     Curve hostFloorEgde = longestCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true))).FirstOrDefault();
                                     floorCurves.Add(hostFloorEgde);
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
+        }
+
+        public List<Curve> GetClosesToAlignmentCurveBySelection(Element floor, Reference selectedAlignment)
+        {
+            Options options = new Options();
+            HermiteSpline alignmentSpline = GetSplineFromAlignment(selectedAlignment, options);
+
+            List<Curve> floorCurves = new List<Curve>();
+            GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    faceCurves.Add(edgeCurve);
+                                }
+                                Curve hostFloorEgde = faceCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true))).FirstOrDefault();
+                                floorCurves.Add(hostFloorEgde);
                             }
                         }
                     }
@@ -140,6 +208,46 @@ namespace ProjectSweeper.StairModule
             return floorCurves;
         }
 
+        public List<Curve> GetFloorSideLines(Element floor, Reference selectedAlignment)
+        {
+            Options options = new Options();
+            HermiteSpline alignmentSpline = GetSplineFromAlignment(selectedAlignment, options);
+            List<Curve> floorCurves = new List<Curve>();
+            GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    faceCurves.Add(edgeCurve);
+                                }
+
+                                List<Curve> longestCurves = faceCurves.OrderByDescending(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true))).ToList();
+                                floorCurves.Add(longestCurves[0]);
+                                floorCurves.Add(longestCurves[longestCurves.Count - 1]);
+                                floorCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true)));
+
+                                //List<Curve> longestCurves = faceCurves.OrderByDescending(curve => curve.Length).Take(2).ToList();
+                                //longestCurves.OrderBy(curve => alignmentSpline.Distance(curve.Evaluate(0.5, true)));
+                                //longestCurves.ForEach(curve => floorCurves.Add(curve));
+                            }
+                        }
+                    }
+                }
+
+            }
+            return floorCurves;
+        }
+
         private HermiteSpline GetSplineFromAlignment(Reference selectedAlignment, Options options)
         {
             HermiteSpline alignmentSpline = null;
@@ -162,7 +270,6 @@ namespace ProjectSweeper.StairModule
 
             return alignmentSpline;
         }
-
 
         public Curve GetFloorLongestCurve(Floor floor)
         {
@@ -208,6 +315,140 @@ namespace ProjectSweeper.StairModule
         {
             Line landingLengthCurve = GetFloorLongestCurve(floor) as Line;
             return landingLengthCurve.Evaluate(0.5, true);
+        }
+
+        public List<Curve> GetLandingStartEndLines(IList<Floor> floorList)
+        {
+            Options options = new Options();
+            List<Curve> floorCurves = new List<Curve>();
+            foreach (Floor floor in floorList)
+            {
+                GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+                foreach (GeometryObject geometryObject in floorgGeometryElements)
+                {
+                    if (geometryObject is Solid solid)
+                    {
+                        foreach (Face face in solid.Faces)
+                        {
+                            if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                            {
+                                foreach (EdgeArray edges in face.EdgeLoops)
+                                {
+                                    List<Curve> faceCurves = new List<Curve>();
+                                    foreach (Edge edge in edges)
+                                    {
+                                        Curve edgeCurve = edge.AsCurve();
+                                        faceCurves.Add(edgeCurve);
+                                    }
+
+                                    List<Curve> longestCurves = faceCurves.OrderBy(curve => curve.Evaluate(0.5, true).X).ToList();
+                                    floorCurves.Add(longestCurves[1]);
+                                    floorCurves.Add(longestCurves[2]);
+
+                                    floorCurves.OrderByDescending(c => c.Evaluate(0.5, true).X).ToList();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
+        }
+
+        public List<Curve> GetLandingStartEndLines(Floor floor)
+        {
+            Options options = new Options();
+            List<Curve> floorCurves = new List<Curve>();
+            GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    faceCurves.Add(edgeCurve);
+                                }
+
+                                List<Curve> longestCurves = faceCurves.OrderBy(curve => curve.Evaluate(0.5, true).X).ToList();
+                                floorCurves.Add(longestCurves[0]);
+                                floorCurves.Add(longestCurves[longestCurves.Count - 1]);
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
+        }
+
+        public List<Curve> GetLandingStartSideCurves(Floor floor)
+        {
+            Options options = new Options();
+            List<Curve> floorCurves = new List<Curve>();
+            GeometryElement floorgGeometryElements = floor.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    faceCurves.Add(edgeCurve);
+                                }
+
+                                List<Curve> longestCurves = faceCurves.OrderBy(curve => curve.Evaluate(0.5, true).X).ToList();
+                                floorCurves.Add(longestCurves[1]);
+                                floorCurves.Add(longestCurves[2]);
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
+        }
+
+        public List<Curve> GetLandingLines(Floor landing)
+        {
+            Options options = new Options();
+            List<Curve> floorCurves = new List<Curve>();
+
+            GeometryElement floorgGeometryElements = landing.get_Geometry(options);
+            foreach (GeometryObject geometryObject in floorgGeometryElements)
+            {
+                if (geometryObject is Solid solid)
+                {
+                    foreach (Face face in solid.Faces)
+                    {
+                        if (face.ComputeNormal(UV.BasisV).Z > 0.0)
+                        {
+                            foreach (EdgeArray edges in face.EdgeLoops)
+                            {
+                                List<Curve> faceCurves = new List<Curve>();
+                                foreach (Edge edge in edges)
+                                {
+                                    Curve edgeCurve = edge.AsCurve();
+                                    floorCurves.Add(edgeCurve);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return floorCurves;
         }
     }
 }

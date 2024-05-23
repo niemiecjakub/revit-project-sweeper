@@ -134,12 +134,21 @@
     <Compile Include="StairModule\Handrail\HandrailFactory.cs" />
     <Compile Include="StairModule\Handrail\Main.cs" />
     <Compile Include="StairModule\HorizontalBeamBuilder.cs" />
+    <Compile Include="StairModule\Schedule\AssignEdgeBeamPurpose.cs" />
+    <Compile Include="StairModule\Schedule\LandingCoordinates.cs" />
+    <Compile Include="StairModule\Schedule\LandingCoordinatesSwitch.cs" />
+    <Compile Include="StairModule\Schedule\LandingParameters.cs" />
     <Compile Include="StairModule\MainByFloorEdges.cs" />
     <Compile Include="StairModule\MainByFloorSelection.cs" />
     <Compile Include="StairModule\Numbering\Main.cs" />
     <Compile Include="StairModule\RampStructure\Main.cs" />
     <Compile Include="StairModule\RunSideBeams\Main.cs" />
+    <Compile Include="StairModule\Schedule\RampParameters.cs" />
+    <Compile Include="StairModule\Schedule\Reset.cs" />
+    <Compile Include="StairModule\Schedule\ScheduleUtil.cs" />
+    <Compile Include="StairModule\Schedule\SwitchParameters.cs" />
     <Compile Include="StairModule\SlantedColumnBuilder.cs" />
+    <Compile Include="StairModule\StairLandingModify\Main.cs" />
     <Compile Include="StairModule\StairModuleUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -147,11 +156,15 @@
       <DependentUpon>StairModuleUI.cs</DependentUpon>
     </Compile>
     <Compile Include="StairModule\StepSelection.cs" />
+    <Compile Include="StairModule\Schedule\StructureNumbering.cs" />
     <Compile Include="StairModule\Structure\BraceFactory.cs" />
     <Compile Include="StairModule\Structure\HorizontalBeamFactory.cs" />
+    <Compile Include="StairModule\Structure\LadderFactory.cs" />
     <Compile Include="StairModule\Structure\Main.cs" />
+    <Compile Include="StairModule\Structure\MainWithLadder.cs" />
     <Compile Include="StairModule\Structure\SideBeamFactory.cs" />
     <Compile Include="StairModule\Structure\SupportColumnFactory.cs" />
+    <Compile Include="StairModule\Structure\SwitchStructure.cs" />
     <Compile Include="StairModule\SupportColumnBuilder.cs" />
     <Compile Include="StairModule\Utils.cs" />
     <Compile Include="Stores\CleanerStore.cs" />

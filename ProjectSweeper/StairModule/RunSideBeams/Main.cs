@@ -45,7 +45,7 @@ namespace ProjectSweeper.StairModule.RunSideBeams
                 string SIDE = stairUI.Side.ToString().ToUpper();
 
                 double BEAM_HEIGHT = Utils.MMToFeetConverter(254);
-                double BEAM_WIDTH = Utils.MMToFeetConverter(70);
+                double BEAM_WIDTH = Utils.MMToFeetConverter(69.6);
                 double STEP_WIDTH = Utils.MMToFeetConverter(296);
                 //double OFFSET_VALUE = SIDE == "R" ? BEAM_WIDTH / 2 : BEAM_WIDTH / 2;
                 double OFFSET_VALUE_TO_COLUMN_AX = Utils.MMToFeetConverter(77);
@@ -53,10 +53,9 @@ namespace ProjectSweeper.StairModule.RunSideBeams
                 SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
                 List<Curve> floorCurves = floorSelection.GetClosesToAlignmentCurveBySelection(floorList, selectedAlignment);
 
-
                 List<Curve> floorLandingSideCurves = floorSelection.GetFloorSideLines(floorList, selectedAlignment);
 
-                string FAMILY_SYMBOL_EDGE_BEAM = "EDGEBEAM_ADAPTIVE";
+                string FAMILY_SYMBOL_EDGE_BEAM = "TNL-SFM-C10X20A36AISC-CH2";
                 FamilySymbol edgeBeamSymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_EDGE_BEAM, BuiltInCategory.OST_GenericModel, doc);
 
                 List<Line> L_sideBeams = new List<Line>();
@@ -67,7 +66,7 @@ namespace ProjectSweeper.StairModule.RunSideBeams
                 {
                     double trimValue = Utils.MMToFeetConverter(296 / 2);
                     Line placementLine = Utils.TrimStartEndByValue(landingCurve as Line, STEP_WIDTH / 2, STEP_WIDTH / 2);
-                    placementLine = Utils.LineOffset(placementLine, Utils.MMToFeetConverter(-70 / 2));
+                    placementLine = Utils.LineOffset(placementLine, Utils.MMToFeetConverter(-69.6 / 2));
                     placementLine = Utils.LineOffsetVerically(placementLine, Utils.MMToFeetConverter(-35));
 
                     int orientationValue = 1;

@@ -41,7 +41,7 @@ namespace ProjectSweeper.StairModule.Handrail
                 }
 
                 FloorSelection floorSelection = new FloorSelection(uidoc, doc);
-                double BEAM_WIDTH = Utils.MMToFeetConverter(70);
+                double BEAM_WIDTH = Utils.MMToFeetConverter(69.6);
                 double HANDRAIL_DIA = Utils.MMToFeetConverter(40);
                 double HANDRAIL_HEIGHT = Utils.MMToFeetConverter(850);
 
@@ -51,7 +51,7 @@ namespace ProjectSweeper.StairModule.Handrail
            
 
                 List<Curve> floorCurves = floorSelection.GetFarToAlignmentCurveBySelection(floorList, selectedAlignment).OrderBy(c => c.GetEndPoint(0).X).ToList();
-                string SUPPORT_FAMILY_NAME = "HAND";
+                string SUPPORT_FAMILY_NAME = "TNL-RLG-HANDRAIL-CH2";
                 FamilySymbol handrailFamily = Utils.GetFamilySymbolByName(SUPPORT_FAMILY_NAME, BuiltInCategory.OST_StructuralFraming, doc);
                 
                 //Build handrail on stair landing

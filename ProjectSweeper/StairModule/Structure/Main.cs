@@ -2,13 +2,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using ProjectSweeper.StairModule.Handrail;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectSweeper.StairModule.Structure
 {
@@ -36,7 +30,7 @@ namespace ProjectSweeper.StairModule.Structure
                     //alignment
                     selectedAlignment = uidoc.Selection.PickObject(ObjectType.Element, "Select alignment");
                     //tunnel
-                    pickedTunnel = uidoc.Selection.PickObject(ObjectType.Element, "Select an element");
+                    pickedTunnel = uidoc.Selection.PickObject(ObjectType.Element, "Select an tunnel lining");
                     //salab
                     pickedSlab = uidoc.Selection.PickObject(ObjectType.Element, "Select slab");
                 }
@@ -49,10 +43,10 @@ namespace ProjectSweeper.StairModule.Structure
                 FloorSelection floorSelection = new FloorSelection(uidoc, doc);
                 StairModuleUI stairUI = new StairModuleUI(commandData);
                 stairUI.ShowDialog();
-                string SIDE = stairUI.Side.ToString().ToUpper();
 
+                string SIDE = stairUI.Side.ToString().ToUpper();
                 double BEAM_HEIGHT = Utils.MMToFeetConverter(254);
-                double BEAM_WIDTH = Utils.MMToFeetConverter(70);
+                double BEAM_WIDTH = Utils.MMToFeetConverter(69.6);
                 double STEP_WIDTH = Utils.MMToFeetConverter(296);
                 //double OFFSET_VALUE = SIDE == "R" ? BEAM_WIDTH / 2 : BEAM_WIDTH / 2;
                 double OFFSET_VALUE_TO_COLUMN_AX = Utils.MMToFeetConverter(77);
@@ -65,117 +59,116 @@ namespace ProjectSweeper.StairModule.Structure
 
                 double maxSpacing = Utils.MMToFeetConverter(3750);
 
-                string IPE_FAMILY_FAME = "HBEAM";
+                //string IPE_FAMILY_FAME = "TNL-SFM-LININGBEAM-CH2";
+                string IPE_FAMILY_FAME = "TNL-SFM-W6X8.5A36AISC15.0-CH2";
                 FamilySymbol horizontalBeamFamily = Utils.GetFamilySymbolByName(IPE_FAMILY_FAME, BuiltInCategory.OST_StructuralFraming, doc);
                 HorizontalBeamFactory horizontalBeamFactory = new HorizontalBeamFactory(doc, maxSpacing, horizontalBeamFamily, tunnelSolids);
 
-                string BRACE_FAMILY_NAME = "BRACE";
+                //string BRACE_FAMILY_NAME = "TNL-SFM-BRACING-CH2";
+                string BRACE_FAMILY_NAME = "TNL-SFM-HSSQ2.5X2.5X0.188A36AISC15.0-CH2";
                 FamilySymbol braceFamily = Utils.GetFamilySymbolByName(BRACE_FAMILY_NAME, BuiltInCategory.OST_StructuralFraming, doc);
 
-   
-                string SUPPORT_FAMILY_NAME = "SUPPORTCOLUMN";
+
+                //string SUPPORT_FAMILY_NAME = "TNL-SCM-SUPPORTCOLUMN-CH2";
+                string SUPPORT_FAMILY_NAME = "TNL-SCM-HSSQ2.5X2.5X0.188A36AISC15.0-CH2";
                 FamilySymbol supportFamily = Utils.GetFamilySymbolByName(SUPPORT_FAMILY_NAME, BuiltInCategory.OST_StructuralColumns, doc);
                 SupportColumnFactory supportColumnFactory = new SupportColumnFactory(doc, maxSpacing, supportFamily, slabSolids);
 
-                foreach (Curve edgeCurve in floorCurves)
+
+                string FAMILY_SYMBOL_LANDING_SUPPORT_BEAM = "TNL-SFM-L2-1/2X2X3/16AISC15.0-CH2";
+                FamilySymbol landingSupportBeamSymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_LANDING_SUPPORT_BEAM, BuiltInCategory.OST_StructuralFraming, doc);
+
+                foreach (Element floor in floorList)
                 {
-                    //double trimStartValue = Utils.MMToFeetConverter(50);
-                    double trimStartValue = SIDE == "R" ? Utils.MMToFeetConverter(296 + 50 + 60) : Utils.MMToFeetConverter(60);
-                    double trimEndValue = SIDE == "R" ? Utils.MMToFeetConverter(60) : Utils.MMToFeetConverter(296 + 50 + 60);
-                    Curve edgeCurveTrimmed = Utils.TrimStartEndByValue(edgeCurve as Line, trimStartValue, trimEndValue);
-                    Line edgeLineOffset = Utils.LineOffset(edgeCurveTrimmed as Line, OFFSET_VALUE_TO_COLUMN_AX);
-             
-                    //SUPPORT BUILD
-                    List<FamilyInstance> supportColumns = supportColumnFactory.BuildAll(SIDE, BEAM_HEIGHT, edgeLineOffset);
+                    string orientation = floor.LookupParameter("Walkway_orientation").AsValueString();
+                    string purpose = floor.LookupParameter("Walkway_purpose").AsValueString();
+                    string mark = floor.LookupParameter("Walkway_mark").AsValueString();
+                    string number = floor.LookupParameter("Walkway_number").AsValueString();
 
-                    //BRACE BUILD
-                    BraceFactory braceFactory = new BraceFactory(doc, supportColumnFactory.ColumnPlacementlines, braceFamily);
-                    List<FamilyInstance> braces = braceFactory.BuildAll();
+                    List<FamilyInstance> builtElements = new List<FamilyInstance>();
+                    List<Curve> crves = floorSelection.GetClosesToAlignmentCurveBySelection(floor, selectedAlignment);
+                    foreach (Curve edgeCurve in crves)
+                    {
+                        //double trimStartValue = Utils.MMToFeetConverter(50);
+                        double trimStartValue = SIDE == "R" ? Utils.MMToFeetConverter(296 + 50 + 60) : Utils.MMToFeetConverter(60);
+                        double trimEndValue = SIDE == "R" ? Utils.MMToFeetConverter(60) : Utils.MMToFeetConverter(296 + 50 + 60);
+                        Curve edgeCurveTrimmed = Utils.TrimStartEndByValue(edgeCurve as Line, trimStartValue, trimEndValue);
+                        Line edgeLineOffset = Utils.LineOffset(edgeCurveTrimmed as Line, OFFSET_VALUE_TO_COLUMN_AX);
 
-                    //HBEAM BUILDER 
-                    List<FamilyInstance> horizontalBeams = horizontalBeamFactory.BuildAll(SIDE, edgeCurveTrimmed);
+                        //SUPPORT BUILD
+                        List<FamilyInstance> supportColumns = supportColumnFactory.BuildAll(SIDE, BEAM_HEIGHT, edgeLineOffset);
 
-                    supportColumnFactory.ColumnPlacementlines.Clear();
+                        //BRACE BUILD
+                        BraceFactory braceFactory = new BraceFactory(doc, supportColumnFactory.ColumnPlacementlines, braceFamily);
+                        List<FamilyInstance> braces = braceFactory.BuildAll();
+
+                        //HBEAM BUILDER 
+                        List<FamilyInstance> horizontalBeams = horizontalBeamFactory.BuildAll(SIDE, edgeCurveTrimmed);
+
+                        supportColumnFactory.ColumnPlacementlines.Clear();
+
+                        builtElements.AddRange(supportColumns);
+                        builtElements.AddRange(braces);
+                        builtElements.AddRange(horizontalBeams);
+                    }
+
+                    List<Curve> sideCurves = floorSelection.GetFloorSideLines(floor, selectedAlignment);
+                    foreach (Curve landingCurve in sideCurves)
+                    {
+                        Line profileLine = Utils.LineOffsetVerically(landingCurve as Line, Utils.MMToFeetConverter(-30));
+                        Level datumLevel = doc.GetElement(Level.GetNearestLevelId(doc, 0)) as Level;
+                        FamilyInstance landingSupportBeam = doc.Create.NewFamilyInstance(profileLine, landingSupportBeamSymbol, datumLevel, Autodesk.Revit.DB.Structure.StructuralType.Beam);
+                        builtElements.Add(landingSupportBeam);
+                    }
+
+                    foreach (FamilyInstance elem in builtElements)
+                    {
+                        elem.LookupParameter("Walkway_orientation").Set(orientation);
+                        elem.LookupParameter("Walkway_purpose").Set(purpose);
+                        elem.LookupParameter("Walkway_mark").Set(mark);
+                        elem.LookupParameter("Walkway_number").Set(number);
+                    }
                 }
 
+
+                //OLD
+                //foreach (Curve edgeCurve in floorCurves)
+                //{
+                //    //double trimStartValue = Utils.MMToFeetConverter(50);
+                //    double trimStartValue = SIDE == "R" ? Utils.MMToFeetConverter(296 + 50 + 60) : Utils.MMToFeetConverter(60);
+                //    double trimEndValue = SIDE == "R" ? Utils.MMToFeetConverter(60) : Utils.MMToFeetConverter(296 + 50 + 60);
+                //    Curve edgeCurveTrimmed = Utils.TrimStartEndByValue(edgeCurve as Line, trimStartValue, trimEndValue);
+                //    Line edgeLineOffset = Utils.LineOffset(edgeCurveTrimmed as Line, OFFSET_VALUE_TO_COLUMN_AX);
+
+                //    //SUPPORT BUILD
+                //    List<FamilyInstance> supportColumns = supportColumnFactory.BuildAll(SIDE, BEAM_HEIGHT, edgeLineOffset);
+
+                //    //BRACE BUILD
+                //    BraceFactory braceFactory = new BraceFactory(doc, supportColumnFactory.ColumnPlacementlines, braceFamily);
+                //    List<FamilyInstance> braces = braceFactory.BuildAll();
+
+                //    //HBEAM BUILDER 
+                //    List<FamilyInstance> horizontalBeams = horizontalBeamFactory.BuildAll(SIDE, edgeCurveTrimmed);
+
+                //    supportColumnFactory.ColumnPlacementlines.Clear();
+                //}
 
                 //// L BEAMS BUILDER
-                List<Curve> floorLandingSideCurves = floorSelection.GetFloorSideLines(floorList, selectedAlignment);
-                string FAMILY_SYMBOL_LANDING_SUPPORT_BEAM = "LBEAM";
-                FamilySymbol landingSupportBeamSymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_LANDING_SUPPORT_BEAM, BuiltInCategory.OST_StructuralFraming, doc);
-                foreach (Curve landingCurve in floorLandingSideCurves)
-                {
-                    Line profileLine = Utils.LineOffsetVerically(landingCurve as Line, Utils.MMToFeetConverter(-30));
-                    Level datumLevel = doc.GetElement(Level.GetNearestLevelId(doc, 0)) as Level;
-                    FamilyInstance landingSupportBeam = doc.Create.NewFamilyInstance(profileLine, landingSupportBeamSymbol, datumLevel, Autodesk.Revit.DB.Structure.StructuralType.Beam);
-                }
+                //List<Curve> floorLandingSideCurves = floorSelection.GetFloorSideLines(floorList, selectedAlignment);
 
-                string FAMILY_SYMBOL_EDGE_BEAM = "EDGEBEAM_ADAPTIVE";
-                FamilySymbol edgeBeamSymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_EDGE_BEAM, BuiltInCategory.OST_GenericModel, doc);
-
-                List<Line> L_sideBeams = new List<Line>();
-                List<Line> R_sideBeams = new List<Line>();
-
-                SideBeamFactory sideBeamFactory = new SideBeamFactory(doc, edgeBeamSymbol);
-                foreach (Curve landingCurve in floorLandingSideCurves)
-                {
-                    double trimValue = Utils.MMToFeetConverter(296 / 2);
-                    Line placementLine = Utils.TrimStartEndByValue(landingCurve as Line, STEP_WIDTH / 2, STEP_WIDTH / 2);
-                    placementLine = Utils.LineOffset(placementLine, Utils.MMToFeetConverter(-70 / 2));
-                    placementLine = Utils.LineOffsetVerically(placementLine, Utils.MMToFeetConverter(-35));
-
-                    int orientationValue = 1;
-                    if (placementLine.GetEndPoint(0).X > placementLine.GetEndPoint(1).X)
-                    {
-                        placementLine = Utils.Reverse(placementLine);
-                        orientationValue = 0;
-                        L_sideBeams.Add(placementLine);
-
-                    } else
-                    {
-                        R_sideBeams.Add(placementLine);
-                    }
-                    FamilyInstance sideBeam = sideBeamFactory.Build(placementLine, orientationValue, "landing");
-                }
-
-                L_sideBeams = L_sideBeams.OrderBy(c => c.GetEndPoint(0).X).ToList();
-                if (L_sideBeams.Count >= 2)
-                { 
-                    for (int i = 0; i < L_sideBeams.Count - 1; i++)
-                    {
-                        int orientationValue = 0;
-                        XYZ endPoint = L_sideBeams[i ].GetEndPoint(1);
-                        XYZ startPoint = L_sideBeams[i+1].GetEndPoint(0);
-                        Line placementLine = Line.CreateBound(startPoint, endPoint);
-                        if (placementLine.GetEndPoint(0).X > placementLine.GetEndPoint(1).X)
-                        {
-                            placementLine = Utils.Reverse(placementLine);
-
-                        }
-                        FamilyInstance sideBeam = sideBeamFactory.Build(placementLine,orientationValue, "run");
-                    }
-                }
-                R_sideBeams = R_sideBeams.OrderBy(c => c.GetEndPoint(0).X).ToList();
-                if (R_sideBeams.Count >=2 )
-                {
-                    for (int i = 0; i < R_sideBeams.Count - 1; i++)
-                    {
-                        int orientationValue = 1;
-                        XYZ endPoint = R_sideBeams[i].GetEndPoint(1);
-                        XYZ startPoint = R_sideBeams[i+1].GetEndPoint(0);
-                        Line placementLine = Line.CreateBound(startPoint, endPoint);
-                        if (placementLine.GetEndPoint(0).X > placementLine.GetEndPoint(1).X)
-                        {
-                            placementLine = Utils.Reverse(placementLine);
-
-                        }
-                        FamilyInstance sideBeam = sideBeamFactory.Build(placementLine, orientationValue, "run");
-                    }
-                }
+                //string FAMILY_SYMBOL_LANDING_SUPPORT_BEAM = "TNL-GRATINGSUPPORTBEAM-CH2";
+                //string FAMILY_SYMBOL_LANDING_SUPPORT_BEAM = "TNL-SFM-L2-1/2X2X3/16AISC15.0-CH2";
+                //FamilySymbol landingSupportBeamSymbol = Utils.GetFamilySymbolByName(FAMILY_SYMBOL_LANDING_SUPPORT_BEAM, BuiltInCategory.OST_StructuralFraming, doc);
+                //foreach (Curve landingCurve in floorLandingSideCurves)
+                //{
+                //    Line profileLine = Utils.LineOffsetVerically(landingCurve as Line, Utils.MMToFeetConverter(-30));
+                //    Level datumLevel = doc.GetElement(Level.GetNearestLevelId(doc, 0)) as Level;
+                //    FamilyInstance landingSupportBeam = doc.Create.NewFamilyInstance(profileLine, landingSupportBeamSymbol, datumLevel, Autodesk.Revit.DB.Structure.StructuralType.Beam);
+                //}    
 
                 transaction.Commit();
             }
-                return Result.Succeeded;
+            return Result.Succeeded;
         }
     }
 }
